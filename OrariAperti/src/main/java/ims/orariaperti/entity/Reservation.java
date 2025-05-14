@@ -104,5 +104,16 @@ public class Reservation {
         this.participants = participants;
     }
 
-
+    @Override
+    public String toString() {
+        return "Reservation{" +
+                "id=" + id +
+                ", date=" + date +
+                ", startTime=" + startTime +
+                ", until=" + until +
+                ", room=" + room +
+                ", description='" + description + '\'' +
+                ", participants='" + participants + '\'' +
+                '}';
+    }
 }
