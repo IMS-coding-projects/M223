@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
 
+
 @Entity
 @Table(name = "reservations")
 public class Reservation {
@@ -19,10 +20,10 @@ public class Reservation {
     private LocalDate date;
 
     @Column(nullable = false)
-    private LocalTime from;
+    private LocalTime startTime; // Renamed from 'from' as it proves to be a reserved keyword
 
     @Column(nullable = false)
-    private LocalTime until;
+    private LocalTime until; // until is fine :)
 
     @Column(nullable = false)
     private int room;
@@ -30,22 +31,23 @@ public class Reservation {
     @Column(nullable = false, columnDefinition = "VARCHAR(200)")
     private String description;
 
-    @Column(nullable = false, columnDefinition = "VARCHAR(255) CHECK (participants ~ '^[A-Za-z]+(,[A-Za-z]+)*$')")
+    @Column(nullable = false, columnDefinition = "VARCHAR(255)")
     private String participants;
 
     public Reservation() {
     }
 
-    public Reservation(UUID id, LocalDate date, LocalTime from, LocalTime until, int room, String description, String participants) {
+    public Reservation(UUID id, LocalDate date, LocalTime startTime, LocalTime until, int room, String description, String participants) {
         this.id = id;
         this.date = date;
-        this.from = from;
+        this.startTime = startTime;
         this.until = until;
         this.room = room;
         this.description = description;
         this.participants = participants;
     }
 
+    // Getters and setters
     public UUID getId() {
         return id;
     }
@@ -62,12 +64,12 @@ public class Reservation {
         this.date = date;
     }
 
-    public LocalTime getFrom() {
-        return from;
+    public LocalTime getStartTime() {
+        return startTime;
     }
 
-    public void setFrom(LocalTime from) {
-        this.from = from;
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
     }
 
     public LocalTime getUntil() {
@@ -101,4 +103,6 @@ public class Reservation {
     public void setParticipants(String participants) {
         this.participants = participants;
     }
+
+
 }

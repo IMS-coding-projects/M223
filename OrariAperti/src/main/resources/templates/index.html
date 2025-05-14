@@ -1,10 +1,105 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>$Title$</title>
+  <title>OrariAperti</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f9f9f9;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .login-button {
+      padding: 8px 16px;
+      background-color: white;
+      color: #4CAF50;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 30px;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
+
+    h2 {
+      color: #333;
+    }
+
+    label {
+      display: block;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .btn {
+      margin-top: 30px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background-color: #45a049;
+    }
+
+    .form-section {
+      margin-top: 40px;
+    }
+  </style>
 </head>
 <body>
-$END$
+
+<header>
+  <h1>OrariAperti</h1>
+  <button class="login-button">Login</button>
+</header>
+
+<div class="container">
+  <h2>Schlüssel eingeben</h2>
+
+  <label for="publicKey">Public Key</label>
+  <input type="text" id="publicKey" name="publicKey" placeholder="Geben Sie den öffentlichen Schlüssel ein">
+
+  <label for="privateKey">Private Key</label>
+  <input type="text" id="privateKey" name="privateKey" placeholder="Geben Sie den privaten Schlüssel ein">
+
+  <button class="btn">Weiter</button>
+
+  <div class="form-section">
+    <h2>Raum reservieren</h2>
+    <button class="btn" onclick="window.location.href='reservation.html'">Reservation erfassen</button>
+  </div>
+</div>
+
 </body>
 </html>
