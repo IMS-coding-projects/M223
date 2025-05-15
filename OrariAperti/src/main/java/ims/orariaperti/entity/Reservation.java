@@ -15,6 +15,10 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     @Column(nullable = false)
     private LocalDate date;
 
@@ -30,20 +34,31 @@ public class Reservation {
     @Column(nullable = false, columnDefinition = "VARCHAR(200)")
     private String description;
 
-    @Column(nullable = false, columnDefinition = "VARCHAR(255)")
+    @Column(nullable = false, columnDefinition = "VARCHAR(255)") //regex missing, has to be done in backend
     private String participants;
+
+    @Column(nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID privateKey;
+
+    @Column(nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID publicKey;
 
     public Reservation() {
     }
 
-    public Reservation(UUID id, LocalDate date, LocalTime from, LocalTime until, int room, String description, String participants) {
+    public Reservation(UUID id, User user, LocalDate date, LocalTime startTime, LocalTime endTime, int room, String description, String participants, UUID privateKey, UUID publicKey) {
         this.id = id;
+        this.user = user;
         this.date = date;
-        this.startTime = from;
-        this.endTime = until;
+        this.startTime = startTime;
+        this.endTime = endTime;
         this.room = room;
         this.description = description;
         this.participants = participants;
+        this.privateKey = privateKey;
+        this.publicKey = publicKey;
     }
 
     public UUID getId() {
@@ -54,6 +69,14 @@ public class Reservation {
         this.id = id;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     public LocalDate getDate() {
         return date;
     }
@@ -62,12 +85,12 @@ public class Reservation {
         this.date = date;
     }
 
-    public LocalTime getFromTime() {
+    public LocalTime getStartTime() {
         return startTime;
     }
 
-    public void setFromTime(LocalTime from) {
-        this.startTime = from;
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
     }
 
     public LocalTime getEndTime() {
@@ -102,16 +125,35 @@ public class Reservation {
         this.participants = participants;
     }
 
+    public UUID getPrivateKey() {
+        return privateKey;
+    }
+
+    public void setPrivateKey(UUID privateKey) {
+        this.privateKey = privateKey;
+    }
+
+    public UUID getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(UUID publicKey) {
+        this.publicKey = publicKey;
+    }
+
     @Override
     public String toString() {
         return "Reservation{" +
                 "id=" + id +
+                ", user=" + user +
                 ", date=" + date +
                 ", startTime=" + startTime +
                 ", endTime=" + endTime +
                 ", room=" + room +
                 ", description='" + description + '\'' +
                 ", participants='" + participants + '\'' +
+                ", privateKey=" + privateKey +
+                ", publicKey=" + publicKey +
                 '}';
     }
 }
