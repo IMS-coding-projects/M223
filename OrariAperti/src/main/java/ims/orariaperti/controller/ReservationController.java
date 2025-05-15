@@ -28,7 +28,7 @@ public class ReservationController {
     public String createReservation(@ModelAttribute Reservation reservation, Model model) {
         // Validate reservation
         if (reservation.getDate().isBefore(LocalDate.now()) ||
-                reservation.getFromTime().isAfter(reservation.getEndTime())) {
+                reservation.getStartTime().isAfter(reservation.getEndTime())) {
             model.addAttribute("error", "Invalid date or time range.");
             return "createReservation";
         }
@@ -38,8 +38,8 @@ public class ReservationController {
         for (Reservation existing : existingReservations) {
             if (existing.getRoom() == reservation.getRoom() &&
                     existing.getDate().equals(reservation.getDate()) &&
-                    (reservation.getFromTime().isBefore(existing.getEndTime()) &&
-                            reservation.getEndTime().isAfter(existing.getFromTime()))) {
+                    (reservation.getStartTime().isBefore(existing.getEndTime()) &&
+                            reservation.getEndTime().isAfter(existing.getStartTime()))) {
                 model.addAttribute("error", "Room is already reserved for the selected time.");
                 return "createReservation";
             }
@@ -82,7 +82,7 @@ public class ReservationController {
         if (reservation.isPresent()) {
             Reservation existingReservation = reservation.get();
             existingReservation.setDate(updatedReservation.getDate());
-            existingReservation.setFromTime(updatedReservation.getFromTime());
+            existingReservation.setStartTime(updatedReservation.getStartTime());
             existingReservation.setEndTime(updatedReservation.getEndTime());
             existingReservation.setRoom(updatedReservation.getRoom());
             existingReservation.setDescription(updatedReservation.getDescription());

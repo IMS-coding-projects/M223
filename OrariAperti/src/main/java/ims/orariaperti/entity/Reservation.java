@@ -38,14 +38,14 @@ public class Reservation {
     private String participants;
 
     @Column(nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID privateKey;
 
     @Column(nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID publicKey;
 
     public Reservation() {
+        this.privateKey = UUID.randomUUID();
+        this.publicKey = UUID.randomUUID();
     }
 
     public Reservation(UUID id, User user, LocalDate date, LocalTime startTime, LocalTime endTime, int room, String description, String participants, UUID privateKey, UUID publicKey) {
