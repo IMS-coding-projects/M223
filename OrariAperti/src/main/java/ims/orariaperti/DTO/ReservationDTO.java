@@ -1,13 +1,10 @@
-package ims.orariaperti.model.DTO;
-
-import ims.orariaperti.entity.User;
+package ims.orariaperti.DTO;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
 
 public class ReservationDTO {
-    private UUID userId;
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
@@ -18,22 +15,13 @@ public class ReservationDTO {
     public ReservationDTO() {
     }
 
-    public ReservationDTO(UUID userId, LocalDate date, LocalTime startTime, LocalTime endTime, int room, String description, String participants) {
-        this.userId = userId;
+    public ReservationDTO(LocalDate date, LocalTime startTime, LocalTime endTime, int room, String description, String participants) {
         this.date = date;
         this.startTime = startTime;
         this.endTime = endTime;
         this.room = room;
         this.description = description;
         this.participants = participants;
-    }
-
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public void setUserId(UUID userId) {
-        this.userId = userId;
     }
 
     public LocalDate getDate() {
@@ -87,7 +75,6 @@ public class ReservationDTO {
     @Override
     public String toString() {
         return "ReservationDTO{" +
-                "userId=" + userId +
                 ", date=" + date +
                 ", startTime=" + startTime +
                 ", endTime=" + endTime +
