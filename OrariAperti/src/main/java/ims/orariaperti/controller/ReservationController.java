@@ -1,19 +1,12 @@
 package ims.orariaperti.controller;
 
+import ims.orariaperti.DTO.ReservationDTO;
 import ims.orariaperti.entity.Reservation;
-import ims.orariaperti.entity.User;
-import ims.orariaperti.model.DTO.ReservationDTO;
 import ims.orariaperti.repository.ReservationRepository;
-import ims.orariaperti.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.thymeleaf.engine.TemplateHandlerAdapterTextHandler;
 
-import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,41 +16,47 @@ import java.util.UUID;
 public class ReservationController {
 
     private final ReservationRepository reservationRepository;
-    private final UserRepository userRepository;
 
-    public ReservationController(ReservationRepository reservationRepository, UserRepository userRepository) {
+    public ReservationController(ReservationRepository reservationRepository) {
         this.reservationRepository = reservationRepository;
-        this.userRepository = userRepository;
     }
 
     @GetMapping
-    public ResponseEntity<List<Reservation>> getReservations() {
-        return ResponseEntity.ok(reservationRepository.findAll());
-    }
-    
-    @GetMapping("/{id}")
-    public ResponseEntity<Reservation> getReservationById(@PathVariable UUID id) {
-        try {
-            return reservationRepository.findById(id)
-                    .map(ResponseEntity::ok)
-                    .orElseGet(() -> ResponseEntity.notFound().build());
-        } catch (IllegalArgumentException e) {
+    public Object getReservations(@RequestHeader(required = false) UUID publicKey, @RequestHeader(required = false) UUID privateKey) {
+        if (publicKey == null && privateKey == null) {
             return ResponseEntity.badRequest().build();
         }
+        if (privateKey != null) {
+            Optional<Object> reservationInDB = reservationRepository.findByPrivateKey(privateKey);
+            if (reservationInDB.isPresent() && reservationInDB.get() instanceof Reservation reservation) {
+                return ResponseEntity.ok(new Object() {
+                    public final Reservation reservationDetails = reservation;
+                    public final UUID privateKey = reservation.getPrivateKey();
+                    public final UUID publicKey = reservation.getPublicKey();
+                });
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } else {
+            Optional<Object> reservationInDB = reservationRepository.findByPublicKey(publicKey);
+            if (reservationInDB.isPresent() && reservationInDB.get() instanceof Reservation reservation) {
+                return ResponseEntity.ok(new Object() {
+                    public final Reservation reservationDetails = reservation;
+                    public final UUID publicKey = reservation.getPublicKey();
+                });
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        }
     }
-    
+
     @PostMapping
     public ResponseEntity<Object> createReservation(@RequestBody ReservationDTO reservationDTO) {
         try {
-            User user = userRepository.getFirstById((reservationDTO.getUserId()));
-            if (user == null) {
-                throw new Exception("User with given ID not found");
-            }
-
             if (!reservationDTO.getParticipants().matches("^[A-Za-z]+(,[A-Za-z]+)*$")) {
                 throw new Exception("Participants field must only contain letters (A-Z, a-z) separated by commas.");
             }
-            
+
             for (Reservation reservation : reservationRepository.findAll()) {
                 boolean isSameRoom = reservation.getRoom() == reservationDTO.getRoom();
                 boolean isSameDate = reservation.getDate().equals(reservationDTO.getDate());
@@ -67,12 +66,12 @@ public class ReservationController {
                     throw new Exception("Room is already reserved for the given time and the given date.");
                 }
             }
-            Reservation reservation = new Reservation(null, user, reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime(), reservationDTO.getRoom(), reservationDTO.getDescription(), reservationDTO.getParticipants(), null, null);
-            reservationRepository.save(reservation);
+            Reservation reservationInDB = new Reservation(null, reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime(), reservationDTO.getRoom(), reservationDTO.getDescription(), reservationDTO.getParticipants(), null, null);
+            reservationRepository.save(reservationInDB);
             return ResponseEntity.ok(new Object() {
-                public final Reservation createdReservation = reservation;
-                public final UUID privateKey = reservation.getPrivateKey();
-                public final UUID publicKey = reservation.getPublicKey();
+                public final Reservation reservation = reservationInDB;
+                public final UUID privateKey = reservationInDB.getPrivateKey();
+                public final UUID publicKey = reservationInDB.getPublicKey();
             });
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
@@ -86,7 +85,7 @@ public class ReservationController {
             return ResponseEntity.notFound().build();
         }
         if (!reservation.getPrivateKey().equals(privateKey)) {
-            return ResponseEntity.status(401).build();        
+            return ResponseEntity.status(401).build();
         }
         reservationRepository.delete(reservation);
         return ResponseEntity.ok().build();
@@ -101,11 +100,6 @@ public class ReservationController {
             }
             if (!reservation.getPrivateKey().equals(privateKey)) {
                 return ResponseEntity.status(401).build();
-            }
-
-            User user = userRepository.getFirstById((reservationDTO.getUserId()));
-            if (user == null) {
-                throw new Exception("User with given ID not found");
             }
 
             if (!reservationDTO.getParticipants().matches("^[A-Za-z]+(,[A-Za-z]+)*$")) {
@@ -124,7 +118,6 @@ public class ReservationController {
 
             return reservationRepository.findById(id)
                     .map(existingReservation -> {
-                        existingReservation.setUser(user);
                         existingReservation.setDate(reservationDTO.getDate());
                         existingReservation.setStartTime(reservationDTO.getStartTime());
                         existingReservation.setEndTime(reservationDTO.getEndTime());
