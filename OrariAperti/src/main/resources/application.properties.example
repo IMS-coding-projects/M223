@@ -1,5 +1,4 @@
 spring.application.name=OrariAperti
-ho
 # Database Configuration
 spring.datasource.url=jdbc:mysql://localhost:3306/orariaperti
 spring.datasource.username=INSERT_YOUR_DATABASE_USERNAME
