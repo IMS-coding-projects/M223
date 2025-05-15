@@ -15,8 +15,7 @@ public class User {
     @Column(unique = true, nullable = false)
     private String username;
     
-    // TODO: Fix default value. is numeric!!!!
-    @Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'USER'")
+    @Column(nullable = false)
     private Roles role;
 
     public User(UUID id, String username, Roles role) {

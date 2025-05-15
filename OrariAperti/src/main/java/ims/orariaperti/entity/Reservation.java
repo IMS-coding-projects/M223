@@ -7,7 +7,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
 
-
 @Entity
 @Table(name = "reservations")
 public class Reservation {
@@ -20,10 +19,10 @@ public class Reservation {
     private LocalDate date;
 
     @Column(nullable = false)
-    private LocalTime startTime; // Renamed from 'from' as it proves to be a reserved keyword
+    private LocalTime startTime;
 
     @Column(nullable = false)
-    private LocalTime until; // until is fine :)
+    private LocalTime endTime;
 
     @Column(nullable = false)
     private int room;
@@ -37,17 +36,16 @@ public class Reservation {
     public Reservation() {
     }
 
-    public Reservation(UUID id, LocalDate date, LocalTime startTime, LocalTime until, int room, String description, String participants) {
+    public Reservation(UUID id, LocalDate date, LocalTime from, LocalTime until, int room, String description, String participants) {
         this.id = id;
         this.date = date;
-        this.startTime = startTime;
-        this.until = until;
+        this.startTime = from;
+        this.endTime = until;
         this.room = room;
         this.description = description;
         this.participants = participants;
     }
 
-    // Getters and setters
     public UUID getId() {
         return id;
     }
@@ -64,20 +62,20 @@ public class Reservation {
         this.date = date;
     }
 
-    public LocalTime getStartTime() {
+    public LocalTime getFromTime() {
         return startTime;
     }
 
-    public void setStartTime(LocalTime startTime) {
-        this.startTime = startTime;
+    public void setFromTime(LocalTime from) {
+        this.startTime = from;
     }
 
-    public LocalTime getUntil() {
-        return until;
+    public LocalTime getEndTime() {
+        return endTime;
     }
 
-    public void setUntil(LocalTime until) {
-        this.until = until;
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
     }
 
     public int getRoom() {
@@ -110,7 +108,7 @@ public class Reservation {
                 "id=" + id +
                 ", date=" + date +
                 ", startTime=" + startTime +
-                ", until=" + until +
+                ", endTime=" + endTime +
                 ", room=" + room +
                 ", description='" + description + '\'' +
                 ", participants='" + participants + '\'' +
