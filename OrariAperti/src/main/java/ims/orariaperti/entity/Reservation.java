@@ -1,8 +1,6 @@
 package ims.orariaperti.entity;
 
-import ims.orariaperti.model.Roles;
 import jakarta.persistence.*;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
