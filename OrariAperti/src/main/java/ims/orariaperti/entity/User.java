@@ -1,5 +1,6 @@
 package ims.orariaperti.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import ims.orariaperti.model.Roles;
 import jakarta.persistence.*;
 
@@ -10,12 +11,14 @@ import java.util.UUID;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @JsonIgnore
     private UUID id;
 
     @Column(unique = true, nullable = false)
     private String username;
     
     @Column(nullable = false)
+    @JsonIgnore
     private Roles role;
 
     public User(UUID id, String username, Roles role) {

@@ -1,5 +1,6 @@
 package ims.orariaperti.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -13,7 +14,7 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
@@ -35,15 +36,25 @@ public class Reservation {
     @Column(nullable = false, columnDefinition = "VARCHAR(255)") //regex missing, has to be done in backend
     private String participants;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
+    @JsonIgnore
     private UUID privateKey;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
+    @JsonIgnore
     private UUID publicKey;
 
+    @PrePersist // an attribute to modify fields before the entity is saved in the database. (this replaces the @generatedvalue tag, that only works on id's)
+    public void generateKeys() {
+        if (this.privateKey == null) {
+            this.privateKey = UUID.randomUUID();
+        }
+        if (this.publicKey == null) {
+            this.publicKey = UUID.randomUUID();
+        }
+    }
+
     public Reservation() {
-        this.privateKey = UUID.randomUUID();
-        this.publicKey = UUID.randomUUID();
     }
 
     public Reservation(UUID id, User user, LocalDate date, LocalTime startTime, LocalTime endTime, int room, String description, String participants, UUID privateKey, UUID publicKey) {

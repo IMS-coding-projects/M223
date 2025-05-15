@@ -47,14 +47,14 @@ public class ReservationController {
     }
     
     @PostMapping
-    public ResponseEntity<Reservation> createReservation(@RequestBody ReservationDTO reservationDTO) {
+    public ResponseEntity<Object> createReservation(@RequestBody ReservationDTO reservationDTO) {
         try {
             User user = userRepository.getFirstById((reservationDTO.getUserId()));
             if (user == null) {
                 throw new Exception("User with given ID not found");
             }
 
-            if (!reservationDTO.getParticipants().matches("^[A-Za-z\\s]+(,[A-Za-z\\s]+)*$")) {
+            if (!reservationDTO.getParticipants().matches("^[A-Za-z]+(,[A-Za-z]+)*$")) {
                 throw new Exception("Participants field must only contain letters (A-Z, a-z) separated by commas.");
             }
             
@@ -69,9 +69,11 @@ public class ReservationController {
             }
             Reservation reservation = new Reservation(null, user, reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime(), reservationDTO.getRoom(), reservationDTO.getDescription(), reservationDTO.getParticipants(), null, null);
             reservationRepository.save(reservation);
-            return reservationRepository.findById(reservation.getId())
-                    .map(ResponseEntity::ok)
-                    .orElseThrow(() -> new Exception("Something failed while creating a reservation"));
+            return ResponseEntity.ok(new Object() {
+                public final Reservation createdReservation = reservation;
+                public final UUID privateKey = reservation.getPrivateKey();
+                public final UUID publicKey = reservation.getPublicKey();
+            });
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -91,10 +93,14 @@ public class ReservationController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Reservation> updateReservation(@PathVariable UUID id, @RequestBody ReservationDTO reservationDTO) {
+    public ResponseEntity<Reservation> updateReservation(@PathVariable UUID id, @RequestBody ReservationDTO reservationDTO, @RequestBody UUID privateKey) {
         try {
-            if (!reservationRepository.existsById(id)) {
+            Reservation reservation = reservationRepository.getFirstById(id);
+            if (reservation == null) {
                 return ResponseEntity.notFound().build();
+            }
+            if (!reservation.getPrivateKey().equals(privateKey)) {
+                return ResponseEntity.status(401).build();
             }
 
             User user = userRepository.getFirstById((reservationDTO.getUserId()));
@@ -102,16 +108,16 @@ public class ReservationController {
                 throw new Exception("User with given ID not found");
             }
 
-            if (!reservationDTO.getParticipants().matches("^[A-Za-z\\s]+(,[A-Za-z\\s]+)*$")) {
+            if (!reservationDTO.getParticipants().matches("^[A-Za-z]+(,[A-Za-z]+)*$")) {
                 throw new Exception("Participants field must only contain letters (A-Z, a-z) separated by commas.");
             }
 
-            for (Reservation reservation : reservationRepository.findAll()) {
-                boolean isSameRoom = reservation.getRoom() == reservationDTO.getRoom();
-                boolean isSameDate = reservation.getDate().equals(reservationDTO.getDate());
-                boolean isOverlappingTime = reservationDTO.getStartTime().isBefore(reservation.getEndTime()) && reservationDTO.getEndTime().isAfter(reservation.getStartTime());
+            for (Reservation currentReservationFromDB : reservationRepository.findAll()) {
+                boolean isSameRoom = currentReservationFromDB.getRoom() == reservationDTO.getRoom();
+                boolean isSameDate = currentReservationFromDB.getDate().equals(reservationDTO.getDate());
+                boolean isOverlappingTime = reservationDTO.getStartTime().isBefore(currentReservationFromDB.getEndTime()) && reservationDTO.getEndTime().isAfter(currentReservationFromDB.getStartTime());
 
-                if (isSameRoom && isSameDate && isOverlappingTime && !reservation.getId().equals(id)) {
+                if (isSameRoom && isSameDate && isOverlappingTime && !currentReservationFromDB.getId().equals(id)) {
                     throw new Exception("Room is already reserved for the given time and the given date.");
                 }
             }
