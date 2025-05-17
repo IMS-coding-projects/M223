@@ -1,7 +1,9 @@
 const BASE_URL = 'http://localhost:8080/api/reservation';
 
-async function testReservationController() {
+async function testReservationAPI() {
     try {
+        console.log('Starting Reservation API Tests...');
+
         // Test POST: Create a new reservation
         console.log('Testing POST /api/reservation...');
         const newReservation = {
@@ -20,7 +22,7 @@ async function testReservationController() {
         const postData = await postResponse.json();
         console.log('POST Response:', postData);
 
-        const createdReservation = postData.createdReservation;
+        const createdReservation = postData.reservation;
         const privateKey = postData.privateKey;
         const publicKey = postData.publicKey;
 
@@ -45,7 +47,6 @@ async function testReservationController() {
         // Test PUT: Update the reservation
         console.log('Testing PUT /api/reservation/{id}...');
         const updatedReservation = {
-            userId: createdReservation.userId,
             date: '2023-12-02',
             startTime: '12:00',
             endTime: '13:00',
@@ -55,8 +56,8 @@ async function testReservationController() {
         };
         const putResponse = await fetch(`${BASE_URL}/${createdReservation.id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...updatedReservation, privateKey })
+            headers: { 'Content-Type': 'application/json', privateKey },
+            body: JSON.stringify({ ...updatedReservation })
         });
         const putData = await putResponse.json();
         console.log('PUT Response:', putData);
@@ -65,13 +66,14 @@ async function testReservationController() {
         console.log('Testing DELETE /api/reservation/{id}...');
         const deleteResponse = await fetch(`${BASE_URL}/${createdReservation.id}`, {
             method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ privateKey })
+            headers: { 'Content-Type': 'application/json', privateKey }
         });
         console.log('DELETE Response:', deleteResponse.status === 200 ? 'Deleted successfully' : 'Failed to delete');
+
     } catch (error) {
         console.error('Error during testing:', error);
     }
 }
 
-testReservationController();
+// Run the tests
+testReservationAPI();
