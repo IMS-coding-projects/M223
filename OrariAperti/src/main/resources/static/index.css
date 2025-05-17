@@ -200,7 +200,7 @@ footer {
     z-index: 1000;
     background-color: var(--secondary-color);
     color: #1e1f22;
-    padding: 5px;
+    padding: 15px;
     margin: 5px;
     border: 1px solid var(--primary-color);
     border-radius: 5px;
@@ -208,6 +208,35 @@ footer {
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
+    display: flex;
+}
+
+.confirmationArea div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.confirmationArea button {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.3s, transform 0.2s, color 0.3s;
+    font-weight: bold;
+}
+
+.confirmationArea button:hover {
+    background-color: var(--hover-color);
+    transform: scale(1.05);
+    color: var(--secondary-color);
 }
 
 @keyframes dropDown {
