@@ -22,8 +22,6 @@ public class Seeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-
-        // Save reservations
         if (reservationRepository.count() == 0) {
             reservationRepository.save(new Reservation(
                     null,
