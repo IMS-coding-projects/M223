@@ -79,7 +79,7 @@ public class ReservationController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReservation(@PathVariable UUID id, @RequestBody UUID privateKey) {
+    public ResponseEntity<Void> deleteReservation(@PathVariable UUID id, @RequestHeader UUID privateKey) {
         Reservation reservation = reservationRepository.getFirstById(id);
         if (reservation == null) {
             return ResponseEntity.notFound().build();
@@ -92,7 +92,7 @@ public class ReservationController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Reservation> updateReservation(@PathVariable UUID id, @RequestBody ReservationDTO reservationDTO, @RequestBody UUID privateKey) {
+    public ResponseEntity<Reservation> updateReservation(@PathVariable UUID id, @RequestBody ReservationDTO reservationDTO, @RequestHeader UUID privateKey) {
         try {
             Reservation reservation = reservationRepository.getFirstById(id);
             if (reservation == null) {
