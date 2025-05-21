@@ -2,6 +2,7 @@ package ims.orariaperti.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
@@ -13,10 +14,6 @@ public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
 
     @Column(nullable = false)
     private LocalDate date;
@@ -44,22 +41,11 @@ public class Reservation {
     @JsonIgnore
     private UUID publicKey;
 
-    @PrePersist // an attribute to modify fields before the entity is saved in the database. (this replaces the @generatedvalue tag, that only works on id's)
-    public void generateKeys() {
-        if (this.privateKey == null) {
-            this.privateKey = UUID.randomUUID();
-        }
-        if (this.publicKey == null) {
-            this.publicKey = UUID.randomUUID();
-        }
-    }
-
     public Reservation() {
     }
 
-    public Reservation(UUID id, User user, LocalDate date, LocalTime startTime, LocalTime endTime, int room, String description, String participants, UUID privateKey, UUID publicKey) {
+    public Reservation(UUID id, LocalDate date, LocalTime startTime, LocalTime endTime, int room, String description, String participants, UUID privateKey, UUID publicKey) {
         this.id = id;
-        this.user = user;
         this.date = date;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -70,20 +56,23 @@ public class Reservation {
         this.publicKey = publicKey;
     }
 
+    @PrePersist
+    // an attribute to modify fields before the entity is saved in the database. (this replaces the @generatedvalue tag, that only works on id's)
+    public void generateKeys() {
+        if (this.privateKey == null) {
+            this.privateKey = UUID.randomUUID();
+        }
+        if (this.publicKey == null) {
+            this.publicKey = UUID.randomUUID();
+        }
+    }
+
     public UUID getId() {
         return id;
     }
 
     public void setId(UUID id) {
         this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public LocalDate getDate() {
@@ -154,7 +143,6 @@ public class Reservation {
     public String toString() {
         return "Reservation{" +
                 "id=" + id +
-                ", user=" + user +
                 ", date=" + date +
                 ", startTime=" + startTime +
                 ", endTime=" + endTime +
