@@ -53,7 +53,7 @@ public class ReservationController {
     @PostMapping
     public ResponseEntity<Object> createReservation(@RequestBody ReservationDTO reservationDTO) {
         try {
-            if (!reservationDTO.getParticipants().matches("^[A-Za-z]+(,[A-Za-z]+)*$")) {
+            if (!reservationDTO.getParticipants().matches("^[A-Za-z\\s]+(,\\s*[A-Za-z\\s]+)*$")) {
                 throw new Exception("Participants field must only contain letters (A-Z, a-z) separated by commas.");
             }
 
@@ -102,7 +102,7 @@ public class ReservationController {
                 return ResponseEntity.status(401).build();
             }
 
-            if (!reservationDTO.getParticipants().matches("^[A-Za-z]+(,[A-Za-z]+)*$")) {
+            if (!reservationDTO.getParticipants().matches("^[A-Za-z\\s]+(,\\s*[A-Za-z\\s]+)*$")) {
                 throw new Exception("Participants field must only contain letters (A-Z, a-z) separated by commas.");
             }
 
