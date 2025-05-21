@@ -11,7 +11,6 @@ import java.util.UUID;
 public interface ReservationRepository extends JpaRepository<Reservation, UUID> {
     Reservation getFirstById(UUID id);
 
-
     Optional<Object> findByPublicKey(UUID publicKey);
 
     Optional<Object> findByPrivateKey(UUID privateKey);
