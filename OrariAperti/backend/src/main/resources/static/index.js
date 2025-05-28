@@ -53,13 +53,11 @@ reservationForm.addEventListener('submit', async (e) => {
         handleError(new Error("Invalid time range"), "Start time must be before end time.", false);
         return;
     }
-
-    // make sure that the participants does not contain numbers[a-zA-Z]
-    if (reservationParticipantsInput.value.match(/\d/)) {
-        handleError(new Error("Invalid participants"), "Participants must not contain numbers.", false);
+    // make sure that the participants do not contain numbers or special characters
+    if (!/^[A-Za-z\s]+(,\s*[A-Za-z\s]+)*$/.test(reservationParticipantsInput.value)) {
+        handleError(new Error("Invalid participants"), "Participants must not contain any special characters or numbers.", false);
         return;
     }
-
     const reservation = {
         date: reservationDateInput.value,
         startTime: reservationStartTimeInput.value,
@@ -240,12 +238,13 @@ async function showReservation() {
                 let buttons = '';
                 if (privateKey) {
                     buttons = `
-<button id="edit-reservation" data-reservation='${JSON.stringify(reservationDetails)}' class="btn btn-primary">
-    <i class="fa-solid fa-pen"></i> Edit
-</button>
-<button id="delete-reservation" data-id="${id}" data-private-key="${privateKey}" class="btn btn-danger">
-    <i class="fa-solid fa-trash"></i> Delete
-</button>                    `;
+                        <button id="edit-reservation" data-reservation='${JSON.stringify(reservationDetails)}' class="btn btn-primary">
+                            <i class="fa-solid fa-pen"></i> Edit
+                        </button>
+                        <button id="delete-reservation" data-id="${id}" data-private-key="${privateKey}" class="btn btn-danger">
+                            <i class="fa-solid fa-trash"></i> Delete
+                        </button>                    
+                    `;
                 } 
 
                 const reservationInfo = `
@@ -356,7 +355,7 @@ function openEditModal(reservationDetails) {
         }
 
         // make sure that the participants does not contain numbers[a-zA-Z]
-        if (reservationParticipantsInput.value.match(/\d/)) {
+        if (!/^[A-Za-z\s]+(,\s*[A-Za-z\s]+)*$/.test(reservationParticipantsInput.value)) {
             handleError(new Error("Invalid participants"), "Participants must not contain numbers.", false);
             return;
         }
