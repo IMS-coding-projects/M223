@@ -1,14 +1,29 @@
 import {ModeToggle} from "@/components/mode-toggle.tsx";
+import logo_dark from "/logo-oa-dark.svg";
+import logo_light from "/logo-oa-light.svg";
 
 export default function Header() {
   return (
       <>
           <header className={"flex items-center justify-between p-3 bg-secondary text-primary"}>
               <div className={"flex items-center gap-2"}>
-                  <div className={"flex flex-col"}>
-                      <span className={"text-3xl font-bold"}>OrariAperti</span>
-                  </div>
+                <img
+                    className="hover:cursor-pointer hidden dark:block"
+                    src={logo_dark}
+                    alt="OrariAperti Logo"
+                    style={{ width: '100px', height: '50px' }}
+                />
+                <img
+                    className="hover:cursor-pointer dark:hidden"
+                    src={logo_light}
+                    alt="OrariAperti Logo"
+                    style={{ width: '100px', height: '50px' }}
+                />
+                <div className={"flex flex-col"}>
+                    <span className={"text-4xl font-bold"}>OrariAperti</span>
+                </div>
               </div>
+
               <div className={"flex items-center gap-4 "}>
                   <ModeToggle/>
               </div>
