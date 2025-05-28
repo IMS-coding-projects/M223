@@ -10,7 +10,7 @@ import java.util.UUID;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, UUID> {
     Reservation getFirstById(UUID id);
-
+    
     Optional<Object> findByPublicKey(UUID publicKey);
 
     Optional<Object> findByPrivateKey(UUID privateKey);
