@@ -1,4 +1,4 @@
-import {ModeToggle} from "@/components/mode-toggle.tsx";
+import {ModeToggle} from "@/components/ui/mode-toggle.tsx";
 import logo_dark from "/logo-oa-dark.svg";
 import logo_light from "/logo-oa-light.svg";
 
