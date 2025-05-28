@@ -80,10 +80,16 @@ export default function MainUIOnly() {
                       <SelectValue placeholder="Select start time" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="08:00">08:00</SelectItem>
-                      <SelectItem value="08:30">08:30</SelectItem>
-                      <SelectItem value="09:00">09:00</SelectItem>
-                      {/* Add more time options as needed */}
+                      {Array.from({ length: 31 }, (_, i) => {
+                        const hour = 6 + Math.floor(i / 2);
+                        const minute = i % 2 === 0 ? "00" : "30";
+                        const time = `${hour.toString().padStart(2, "0")}:${minute}`;
+                        return (
+                            <SelectItem key={time} value={time}>
+                              {time}
+                            </SelectItem>
+                        );
+                      })}
                     </SelectContent>
                   </Select>
                 </div>
@@ -96,10 +102,16 @@ export default function MainUIOnly() {
                       <SelectValue placeholder="Select end time" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="09:30">09:30</SelectItem>
-                      <SelectItem value="10:00">10:00</SelectItem>
-                      <SelectItem value="10:30">10:30</SelectItem>
-                      {/* Add more time options as needed */}
+                      {Array.from({ length: 31 }, (_, i) => {
+                        const hour = 6 + Math.floor(i / 2);
+                        const minute = i % 2 === 0 ? "00" : "30";
+                        const time = `${hour.toString().padStart(2, "0")}:${minute}`;
+                        return (
+                            <SelectItem key={time} value={time}>
+                              {time}
+                            </SelectItem>
+                        );
+                      })}
                     </SelectContent>
                   </Select>
                 </div>
