@@ -29,8 +29,7 @@ import type {ReservationDTO} from "@/types/types.ts";
 import axios from "axios";
 
 export default function MainUIOnly() {
-  const { register, handleSubmit, reset } = useForm<ReservationDTO>();
-
+  const { register, handleSubmit, reset, watch, setValue } = useForm<ReservationDTO>();
   const onSubmit = async (data: ReservationDTO) => {
     try {
       const response = await axios.post("http://localhost:8080/api/reservation", data);
@@ -65,12 +64,21 @@ export default function MainUIOnly() {
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button variant="outline" className="w-full pl-3 text-left font-normal">
-                        <span>Pick a date</span>
+                        <span>{watch("date") || "Pick a date"}</span>
                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar mode="single" initialFocus {...register("date")}/>
+                      <Calendar
+                          mode="single"
+                          initialFocus
+                          selected={watch("date") ? new Date(watch("date")) : undefined}
+                          onSelect={(date) => {
+                            if (date) {
+                              setValue("date", date.toISOString().split("T")[0]); // Convert Date to YYYY-MM-DD string
+                            }
+                          }}
+                      />
                     </PopoverContent>
                   </Popover>
                 </div>
