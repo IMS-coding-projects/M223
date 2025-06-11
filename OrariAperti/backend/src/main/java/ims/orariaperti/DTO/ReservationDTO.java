@@ -2,7 +2,6 @@ package ims.orariaperti.DTO;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.UUID;
 
 public class ReservationDTO {
     private LocalDate date;
