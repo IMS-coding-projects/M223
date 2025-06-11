@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import Form from "@/components/Form";
 import {
   Popover,
   PopoverContent,
@@ -23,11 +24,30 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { CalendarIcon } from "lucide-react";
+import {useForm} from "react-hook-form";
+import type {ReservationDTO} from "@/types/types.ts";
+import axios from "axios";
 
 export default function MainUIOnly() {
+  const { register, handleSubmit, reset } = useForm<ReservationDTO>();
+
+  const onSubmit = async (data: ReservationDTO) => {
+    try {
+      const response = await axios.post("http://localhost:8080/api/reservation", data);
+      alert("Reservation created! Keys in response.");
+      console.log(response.data);
+      reset();
+    } catch (error) {
+      alert("Failed to create reservation");
+      console.error(error);
+    }
+  };
+
   return (
       <main className="container mx-auto px-2 sm:px-6 pt-6 min-h-screen flex flex-col items-center w-full">
         <h1 className="text-3xl font-bold mb-6">Create a Reservation</h1>
+
+        <Form></Form>
 
         <Card className="w-full max-w-2xl">
           <CardHeader>
@@ -37,7 +57,7 @@ export default function MainUIOnly() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form className="space-y-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Date Field */}
                 <div className="flex flex-col">
@@ -50,7 +70,7 @@ export default function MainUIOnly() {
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar mode="single" initialFocus />
+                      <Calendar mode="single" initialFocus {...register("date")}/>
                     </PopoverContent>
                   </Popover>
                 </div>
@@ -59,7 +79,7 @@ export default function MainUIOnly() {
                 <div>
                   <Label>Room</Label>
                   <Select>
-                    <SelectTrigger>
+                    <SelectTrigger {...register("room")}>
                       <SelectValue placeholder="Select a room" />
                     </SelectTrigger>
                     <SelectContent>
@@ -76,7 +96,7 @@ export default function MainUIOnly() {
                 <div>
                   <Label>Start Time</Label>
                   <Select>
-                    <SelectTrigger>
+                    <SelectTrigger {...register("startTime")}>
                       <SelectValue placeholder="Select start time" />
                     </SelectTrigger>
                     <SelectContent>
@@ -98,7 +118,7 @@ export default function MainUIOnly() {
                 <div>
                   <Label>End Time</Label>
                   <Select>
-                    <SelectTrigger>
+                    <SelectTrigger {...register("endTime")}>
                       <SelectValue placeholder="Select end time" />
                     </SelectTrigger>
                     <SelectContent>
@@ -120,7 +140,7 @@ export default function MainUIOnly() {
               {/* Description Field */}
               <div>
                 <Label>Description</Label>
-                <Textarea
+                <Textarea {...register("description")}
                     placeholder="Enter a description for your reservation"
                     className="resize-none"
                 />
@@ -132,7 +152,7 @@ export default function MainUIOnly() {
               {/* Participants Field */}
               <div>
                 <Label>Participants</Label>
-                <Input placeholder="John,Jane,Alex" />
+                <Input placeholder="John,Jane,Alex" {...register("participants")}/>
                 <p className="text-sm text-muted-foreground">
                   Enter participant names separated by commas (letters only).
                 </p>

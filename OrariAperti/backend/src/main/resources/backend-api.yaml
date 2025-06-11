@@ -3,7 +3,7 @@ info:
   title: OrariAperti Reservation API
   version: 1.0.0
 servers:
-  - url: /api/reservation
+  - url: localhost:8080/api
 paths:
   /reservation:
     get:
