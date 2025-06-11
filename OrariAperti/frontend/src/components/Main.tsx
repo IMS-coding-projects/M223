@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import Form from "@/components/Form";
 import {
   Popover,
   PopoverContent,
@@ -45,8 +44,6 @@ export default function MainUIOnly() {
   return (
       <main className="container mx-auto px-2 sm:px-6 pt-6 min-h-screen flex flex-col items-center w-full">
         <h1 className="text-3xl font-bold mb-6">Create a Reservation</h1>
-
-        <Form></Form>
 
         <Card className="w-full max-w-2xl">
           <CardHeader>
