@@ -24,8 +24,9 @@ public class Reservation {
     @Column(nullable = false)
     private LocalTime endTime;
 
-    @Column(nullable = false)
-    private int room;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "room_id", nullable = false)
+    private Room room;
 
     @Column(nullable = false, columnDefinition = "VARCHAR(200)")
     private String description;
@@ -44,7 +45,7 @@ public class Reservation {
     public Reservation() {
     }
 
-    public Reservation(UUID id, LocalDate date, LocalTime startTime, LocalTime endTime, int room, String description, String participants, UUID privateKey, UUID publicKey) {
+    public Reservation(UUID id, LocalDate date, LocalTime startTime, LocalTime endTime, Room room, String description, String participants, UUID privateKey, UUID publicKey) {
         this.id = id;
         this.date = date;
         this.startTime = startTime;
@@ -99,11 +100,11 @@ public class Reservation {
         this.endTime = endTime;
     }
 
-    public int getRoom() {
+    public Room getRoom() {
         return room;
     }
 
-    public void setRoom(int room) {
+    public void setRoom(Room room) {
         this.room = room;
     }
 
@@ -146,7 +147,7 @@ public class Reservation {
                 ", date=" + date +
                 ", startTime=" + startTime +
                 ", endTime=" + endTime +
-                ", room=" + room +
+                ", room=" + (room != null ? room.getId() : null) +
                 ", description='" + description + '\'' +
                 ", participants='" + participants + '\'' +
                 ", privateKey=" + privateKey +

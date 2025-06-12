@@ -2,23 +2,24 @@ package ims.orariaperti.DTO;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.UUID;
 
 public class ReservationDTO {
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
-    private int room;
+    private UUID roomId;
     private String description;
     private String participants;
 
     public ReservationDTO() {
     }
 
-    public ReservationDTO(LocalDate date, LocalTime startTime, LocalTime endTime, int room, String description, String participants) {
+    public ReservationDTO(LocalDate date, LocalTime startTime, LocalTime endTime, UUID roomId, String description, String participants) {
         this.date = date;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.room = room;
+        this.roomId = roomId;
         this.description = description;
         this.participants = participants;
     }
@@ -47,12 +48,12 @@ public class ReservationDTO {
         this.endTime = endTime;
     }
 
-    public int getRoom() {
-        return room;
+    public UUID getRoomId() {
+        return roomId;
     }
 
-    public void setRoom(int room) {
-        this.room = room;
+    public void setRoomId(UUID roomId) {
+        this.roomId = roomId;
     }
 
     public String getDescription() {
@@ -77,7 +78,7 @@ public class ReservationDTO {
                 ", date=" + date +
                 ", startTime=" + startTime +
                 ", endTime=" + endTime +
-                ", room=" + room +
+                ", roomId=" + roomId +
                 ", description='" + description + '\'' +
                 ", participants='" + participants + '\'' +
                 '}';
