@@ -23,8 +23,6 @@ export default function AccessKeys({ onReservationLoaded }: { onReservationLoade
         setError(null);
         setLoading(true);
         try {
-            // debugger
-            debugger
             const headers: Record<string, string> = { "Content-Type": "application/json" };
             if (privateKey) headers["privateKey"] = privateKey;
             else if (publicKey) headers["publicKey"] = publicKey;

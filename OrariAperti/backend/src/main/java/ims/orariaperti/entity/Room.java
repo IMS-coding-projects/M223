@@ -1,5 +1,7 @@
 package ims.orariaperti.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import ims.orariaperti.serializer.RoomFeaturesSerializer;
 import ims.orariaperti.utilities.RoomFeatures;
 import jakarta.persistence.*;
 
@@ -18,7 +20,8 @@ public class Room {
      * Should contain only the numbers. **without** the "Room {nmr}" Room prefix.
      */
     private String roomNumber;
-    
+
+    @JsonSerialize(contentUsing = RoomFeaturesSerializer.class)
     private ArrayList<RoomFeatures> roomFeatures;
 
     public Room() {
