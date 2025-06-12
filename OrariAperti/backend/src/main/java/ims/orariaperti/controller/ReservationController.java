@@ -15,7 +15,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/reservation")
-@Controller
 public class ReservationController {
 
     private final ReservationRepository reservationRepository;
@@ -27,12 +26,12 @@ public class ReservationController {
     }
 
     @GetMapping
-    public Object getReservations(@RequestHeader(required = false) UUID publicKey, @RequestHeader(required = false) UUID privateKey) {
-        if (publicKey == null && privateKey == null) {
+    public Object getReservations(@RequestHeader(required = false) UUID publickey, @RequestHeader(required = false) UUID privatekey) {
+        if (publickey == null && privatekey == null) {
             return ResponseEntity.badRequest().build();
         }
-        if (privateKey != null) {
-            Optional<Object> reservationInDB = reservationRepository.findByPrivateKey(privateKey);
+        if (privatekey != null) {
+            Optional<Object> reservationInDB = reservationRepository.findByPrivateKey(privatekey);
             if (reservationInDB.isPresent() && reservationInDB.get() instanceof Reservation reservation) {
                 return ResponseEntity.ok(Map.of(
                     "reservationDetails", reservation,
@@ -43,7 +42,7 @@ public class ReservationController {
                 return ResponseEntity.notFound().build();
             }
         } else {
-            Optional<Object> reservationInDB = reservationRepository.findByPublicKey(publicKey);
+            Optional<Object> reservationInDB = reservationRepository.findByPublicKey(publickey);
             if (reservationInDB.isPresent() && reservationInDB.get() instanceof Reservation reservation) {
                 return ResponseEntity.ok(Map.of(
                     "reservationDetails", reservation,

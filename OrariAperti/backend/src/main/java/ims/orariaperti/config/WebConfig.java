@@ -13,15 +13,15 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins(frontendUrl)
+                .allowedOrigins(frontendUrl, "http://localhost:8080")
                 .allowedMethods("*")
                 .allowedHeaders("*");
     }
     
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/").setViewName("forward:" + frontendUrl);
-        registry.addViewController("/{x:[\\w\\-]+}").setViewName("forward:" + frontendUrl);
-        registry.addViewController("/{x:^(?!api$).*$}/**").setViewName("forward:" + frontendUrl);
+        registry.addViewController("/").setViewName("redirect:" + frontendUrl);
+        registry.addViewController("/{x:[\\w\\-]+}").setViewName("redirect:" + frontendUrl);
+        registry.addViewController("/{x:^(?!api$).*$}/**").setViewName("redirect:" + frontendUrl);
     }
 }
