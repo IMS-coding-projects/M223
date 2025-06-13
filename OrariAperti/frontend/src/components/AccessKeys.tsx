@@ -11,16 +11,15 @@ import {Label} from "@/components/ui/label.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import { useState } from "react";
 import type { Reservation } from "@/types/types";
+import { toast } from "sonner";
 
 export default function AccessKeys({ onReservationLoaded }: { onReservationLoaded?: (reservation: Reservation) => void }) {
     const [privateKey, setPrivateKey] = useState("");
     const [publicKey, setPublicKey] = useState("");
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        setError(null);
         setLoading(true);
         try {
             const headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -38,7 +37,7 @@ export default function AccessKeys({ onReservationLoaded }: { onReservationLoade
         } catch (err: unknown) {
             let message = "Failed to load reservation.";
             if (err instanceof Error) message = err.message;
-            setError(message);
+            toast.error(message, {dismissible: true, duration: 4000});
         } finally {
             setLoading(false);
         }
@@ -76,7 +75,6 @@ export default function AccessKeys({ onReservationLoaded }: { onReservationLoade
                                     onChange={e => setPublicKey(e.target.value)}
                                 />
                             </div>
-                            {error && <div className="text-red-500 text-xs">{error}</div>}
                         </div>
                     </CardContent>
                     <CardFooter className={"flex-col gap-2"}>
