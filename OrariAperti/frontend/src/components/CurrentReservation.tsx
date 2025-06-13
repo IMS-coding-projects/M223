@@ -1,10 +1,13 @@
-import {Card, CardHeader, CardTitle, CardContent, CardDescription} from "@/components/ui/card";
+import {Card, CardHeader, CardTitle, CardContent, CardDescription, CardAction} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/textarea";
 import {useState} from "react";
 import type {Reservation} from "@/types/types";
+import NewReservationDialog from "@/components/dialogs/NewReservationDialog.tsx";
+import {toast} from "sonner";
+import {LucideLink} from "lucide-react";
 
 export default function CurrentReservation({reservation}: { reservation?: Reservation }) {
     const [editData, setEditData] = useState<Reservation | undefined>(reservation);
@@ -22,6 +25,9 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
                         <CardDescription>
                             Please load your reservations to view the current reservation details.
                         </CardDescription>
+                        <CardAction>
+                            <NewReservationDialog/>
+                        </CardAction>
                     </CardHeader>
                 </Card>
             </>
@@ -30,7 +36,7 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
 
     // Render room details
     const room = reservation.room;
-    let roomDisplay = "";
+    let roomDisplay: string;
     let featuresDisplay = "";
     if (room && typeof room === "object" && "roomNumber" in room) {
         roomDisplay = (room as { roomNumber?: string }).roomNumber || (room as { id?: string }).id || "";
@@ -87,7 +93,7 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
         if (!reservation) return;
         const url = `${window.location.origin}?publicKey=${reservation.publicKey}`;
         navigator.clipboard.writeText(url);
-        alert("Share link copied to clipboard!");
+        toast.success("Share link copied to clipboard!");
     }
 
     return (
@@ -97,6 +103,9 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
                 <CardDescription>
                     Reservation details and access keys.
                 </CardDescription>
+                <CardAction>
+                    <Button type="button" onClick={handleShare}>Share<LucideLink/></Button>
+                </CardAction>
             </CardHeader>
             <CardContent className="space-y-3">
                 <form className="space-y-3" onSubmit={e => { e.preventDefault(); if (editing) handleSave(); }}>
@@ -153,8 +162,9 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
                                 </>
                             )
                         ) : (
-                            <Button type="button" onClick={handleShare}>Share</Button>
-                        )}
+                            <></>
+                        )
+                        }
                     </div>
                 </form>
             </CardContent>
