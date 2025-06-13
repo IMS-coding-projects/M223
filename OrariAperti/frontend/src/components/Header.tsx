@@ -6,7 +6,7 @@ import NewReservationDialog from "@/components/dialogs/NewReservationDialog.tsx"
 export default function Header() {
   return (
       <>
-          <header className={"flex items-center justify-between p-3 bg-secondary text-primary"}>
+          <header className={"flex items-center justify-between p-3 bg-secondary text-secondary-foreground"}>
               <div className={"flex items-center gap-2"}>
                 <img
                     className="hover:cursor-pointer hidden dark:block"
