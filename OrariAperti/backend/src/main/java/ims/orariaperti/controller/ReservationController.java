@@ -57,7 +57,7 @@ public class ReservationController {
     @PostMapping
     public ResponseEntity<Object> createReservation(@RequestBody ReservationDTO reservationDTO) {
         try {
-            if (!reservationDTO.getParticipants().matches("^[A-Za-z\\s]+(,\\s*[A-Za-z\\s]+)*$")) {
+            if (!reservationDTO.getParticipants().matches("^[A-Za-zÄäÖöÜüßèéêç ]+(, *[A-Za-zÄäÖöÜüßèéêç ]+)*$")) {
                 throw new Exception("Participants field must only contain letters (A-Z, a-z) separated by commas.");
             }
             Room room = roomRepository.findById(reservationDTO.getRoomId()).orElse(null);

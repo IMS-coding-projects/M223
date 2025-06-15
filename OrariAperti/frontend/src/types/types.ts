@@ -1,14 +1,38 @@
 export interface ReservationDTO {
-    date: string; // format: "YYYY-MM-DD"
-    startTime: string; // format: "HH:mm"
-    endTime: string; // format: "HH:mm"
-    room: number;
+    date: string;
+    startTime: string;
+    endTime: string;
+    roomId: string; 
     description: string;
-    participants: string; // comma-separated participant names
+    participants: string;
 }
 
 export interface Reservation extends ReservationDTO {
-    id: string; // UUID
-    privateKey: string; // UUID
-    publicKey: string; // UUID
+    id: string;
+    privateKey: string; 
+    publicKey: string;
 }
+
+export type Room = {
+    id: string;
+    roomNumber: string;
+    roomFeatures: string[];
+};
+
+export type RoomFeature =
+    | "Beamer"
+    | "Water Tap"
+    | "Whiteboard"
+    | "Air Conditioning"
+    | "Projector Screen"
+    | "Speaker System"
+    | "Video Conferencing"
+    | "WiFi"
+    | "Power Outlets"
+    | "Natural Light"
+    | "Soundproofing"
+    | "Smart Board"
+    | "Telephone"
+    | "Coffee Machine"
+    | "Printer"
+    | "Lockers";
