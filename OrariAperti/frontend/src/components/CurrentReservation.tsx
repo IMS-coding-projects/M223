@@ -7,7 +7,7 @@ import {useState} from "react";
 import type {Reservation} from "@/types/types";
 import NewReservationDialog from "@/components/dialogs/NewReservationDialog.tsx";
 import {toast} from "sonner";
-import {LucideLink} from "lucide-react";
+import {LucideEdit2, LucideLink} from "lucide-react";
 
 export default function CurrentReservation({reservation}: { reservation?: Reservation }) {
     const [editData, setEditData] = useState<Reservation | undefined>(reservation);
@@ -19,11 +19,11 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
     if (!reservation) {
         return (
             <>
-                <Card className="h-[96%] w-full ml-8">
+                <Card className="h-[108vh] w-full ml-8">
                     <CardHeader>
                         <CardTitle>No Current Reservation</CardTitle>
                         <CardDescription>
-                            Please load your reservations to view the current reservation details.
+                            Please enter the provided keys on the Access Key Panel or create a new Reservation
                         </CardDescription>
                         <CardAction>
                             <NewReservationDialog/>
@@ -101,17 +101,17 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
             <CardHeader>
                 <CardTitle>Current Reservation</CardTitle>
                 <CardDescription>
-                    Reservation details and access keys.
+                    Reservation details for the provided Access Key
                 </CardDescription>
                 <CardAction>
-                    <Button type="button" onClick={handleShare}>Share<LucideLink/></Button>
+                    <Button type="button" onClick={handleShare}><LucideLink/>Share</Button>
                 </CardAction>
             </CardHeader>
             <CardContent className="space-y-3">
                 <form className="space-y-3" onSubmit={e => { e.preventDefault(); if (editing) handleSave(); }}>
                     <div>
                         <Label>Date:</Label>
-                        <Input name="date" value={editing && editData ? editData.date : reservation.date} onChange={handleChange} readOnly={!isPrivate || !editing} />
+                        <Input type={"date"} name="date" value={editing && editData ? editData.date : reservation.date} onChange={handleChange} readOnly={!isPrivate || !editing} />
                     </div>
                     <div>
                         <Label>Time:</Label>
@@ -138,12 +138,11 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
                         <Label>Participants:</Label>
                         <Textarea name="participants" value={editing && editData ? editData.participants : reservation.participants} onChange={handleChange} readOnly={!isPrivate || !editing} />
                     </div>
-                    <div>
-                        <Label>Reservation ID:</Label> <Input value={reservation.id} readOnly />
-                    </div>
-                    <div>
-                        <Label>Private Key:</Label> <Input value={reservation.privateKey} readOnly />
-                    </div>
+                    {reservation.privateKey && 
+                        <div>
+                            <Label>Private Key:</Label> <Input value={reservation.privateKey} readOnly />
+                        </div>
+                    }
                     <div>
                         <Label>Public Key:</Label> <Input value={reservation.publicKey} readOnly />
                     </div>
@@ -157,8 +156,7 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
                                 </>
                             ) : (
                                 <>
-                                    <Button type="button" onClick={() => { setEditing(true); setEditData(reservation); }}>Edit</Button>
-                                    <Button type="button" variant="secondary" onClick={handleShare}>Share</Button>
+                                    <Button type="button" onClick={() => { setEditing(true); setEditData(reservation); }}><LucideEdit2/>Edit</Button>
                                 </>
                             )
                         ) : (

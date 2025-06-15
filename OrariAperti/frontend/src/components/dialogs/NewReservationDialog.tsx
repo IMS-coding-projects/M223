@@ -6,7 +6,7 @@ import {Calendar} from "@/components/ui/calendar.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {Textarea} from "@/components/ui/textarea.tsx";
 import {Input} from "@/components/ui/input.tsx";
-import {useForm} from "react-hook-form";
+import {type FieldErrors, useForm} from "react-hook-form";
 import type {ReservationDTO} from "@/types/types.ts";
 import axios from "axios";
 import {
@@ -20,6 +20,7 @@ import {
     DialogClose
 } from "@/components/ui/dialog";
 import {format} from "date-fns";
+import {toast} from "sonner";
 
 export default function NewReservationDialog() {
     const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm<ReservationDTO>({
@@ -33,7 +34,7 @@ export default function NewReservationDialog() {
             const start = data.startTime;
             const end = data.endTime;
             if (start >= end) {
-                alert("Start time must be before end time.");
+                toast.error("Start time must be before end time.");
                 return;
             }
         }
@@ -41,7 +42,7 @@ export default function NewReservationDialog() {
         // Prepare payload for backend
         const payload = {
             ...data,
-            room: parseInt(data.room as any, 10),
+            room: parseInt(data.room as never, 10),
             date: data.date, // already YYYY-MM-DD
             startTime: data.startTime, // already HH:mm
             endTime: data.endTime, // already HH:mm
@@ -51,11 +52,11 @@ export default function NewReservationDialog() {
 
         try {
             const response = await axios.post(import.meta.env.VITE_APP_BACKEND_URL+ "/api/reservation", payload);
-            alert("Reservation created! Keys in response.");
+            toast.error("Reservation created! Keys in response.");
             console.log(response.data);
             reset();
         } catch (error) {
-            alert("Failed to create reservation");
+            toast.error("Failed to create reservation");
             console.error(error);
         }
     };
@@ -66,7 +67,7 @@ export default function NewReservationDialog() {
                 <DialogTrigger asChild>
                     <Button>
                         <LucideEdit />
-                        <span className="hidden sm:inline pl-2">Create Reservation</span>
+                        <span className="hidden sm:inline">Create Reservation</span>
                     </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-2xl">
@@ -105,7 +106,7 @@ function NewReservation({
     register: ReturnType<typeof useForm<ReservationDTO>>["register"],
     watch: ReturnType<typeof useForm<ReservationDTO>>["watch"],
     setValue: ReturnType<typeof useForm<ReservationDTO>>["setValue"],
-    errors: any,
+    errors: FieldErrors<ReservationDTO>,
 }) {
     return (
         <>
