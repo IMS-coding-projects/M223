@@ -181,7 +181,7 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
                                 <>
                                     <div className="flex gap-2 w-full">
                                         <Button className={"w-1/2"} type="button" onClick={() => { setEditing(true); setEditData(reservation); }}><LucideEdit2/>Edit</Button>
-                                        <Button className={"w-1/2"} type="button" variant="destructive" onClick={handleDelete} disabled={deleting}><Trash2/>Delete</Button>
+                                        <Button className={"w-1/2"} type="button" variant="destructive" onClick={handleDelete} disabled={deleting}><Trash2/>{deleting ? "Deleting..." : "Delete"}</Button>
                                     </div>
                                 </>
                             )
