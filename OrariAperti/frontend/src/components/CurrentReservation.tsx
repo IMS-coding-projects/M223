@@ -7,12 +7,13 @@ import {useState} from "react";
 import type {Reservation} from "@/types/types";
 import NewReservationDialog from "@/components/dialogs/NewReservationDialog.tsx";
 import {toast} from "sonner";
-import {LucideEdit2, LucideLink} from "lucide-react";
+import {LucideEdit2, LucideLink, Trash2} from "lucide-react";
 
 export default function CurrentReservation({reservation}: { reservation?: Reservation }) {
     const [editData, setEditData] = useState<Reservation | undefined>(reservation);
     const [editing, setEditing] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [deleting, setDeleting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const isPrivate = !!reservation?.privateKey;
 
@@ -96,6 +97,28 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
         toast.success("Share link copied to clipboard!");
     }
 
+    async function handleDelete() {
+        if (!reservation) return;
+        setDeleting(true);
+        setError(null);
+        try {
+            const res = await fetch(`${import.meta.env.VITE_APP_BACKEND_URL}/api/reservation/${reservation.id}`, {
+                method: "DELETE",
+                headers: {
+                    privateKey: reservation.privateKey,
+                },
+            });
+            if (!res.ok) throw new Error("Failed to delete reservation.");
+            toast.success("Reservation delted successfully!");
+
+            // Redirect that damn user back to the homepage :OO
+            window.location.href = "/";
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Failed to delete reservation.");
+            toast.error("Failed to delete reservation.");
+        }
+    }
+
     return (
         <Card className="h-full w-full">
             <CardHeader>
@@ -156,7 +179,10 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
                                 </>
                             ) : (
                                 <>
-                                    <Button className={"w-full"} type="button" onClick={() => { setEditing(true); setEditData(reservation); }}><LucideEdit2/>Edit</Button>
+                                    <div className="flex gap-2 w-full">
+                                        <Button className={"w-1/2"} type="button" onClick={() => { setEditing(true); setEditData(reservation); }}><LucideEdit2/>Edit</Button>
+                                        <Button className={"w-1/2"} type="button" variant="destructive" onClick={handleDelete} disabled={deleting}><Trash2/>Delete</Button>
+                                    </div>
                                 </>
                             )
                         ) : (
