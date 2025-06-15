@@ -184,22 +184,22 @@ components:
     RoomFeatures:
       type: string
       enum:
-        - BEAMER
-        - WATER_SOURCE
-        - WHITEBOARD
-        - AIR_CONDITIONING
-        - PROJECTOR_SCREEN
-        - SPEAKER_SYSTEM
-        - VIDEO_CONFERENCING
-        - WIFI
-        - POWER_OUTLETS
-        - NATURAL_LIGHT
-        - SOUNDPROOFING
-        - SMART_BOARD
-        - TELEPHONE
-        - COFFEE_MACHINE
-        - PRINTER
-        - LOCKERS
+        - "Beamer"
+        - "Water Tap"
+        - "Whiteboard"
+        - "Air Conditioning"
+        - "Projector Screen"
+        - "Speaker System"
+        - "Video Conferencing"
+        - "WiFi"
+        - "Power Outlets"
+        - "Natural Light"
+        - "Soundproofing"
+        - "Smart Board"
+        - "Telephone"
+        - "Coffee Machine"
+        - "Printer"
+        - "Lockers"
     Reservation:
       type: object
       properties:

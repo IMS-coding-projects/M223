@@ -19,7 +19,7 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
     if (!reservation) {
         return (
             <>
-                <Card className="h-[108vh] w-full ml-8">
+                <Card className="h-full w-full">
                     <CardHeader>
                         <CardTitle>No Current Reservation</CardTitle>
                         <CardDescription>
@@ -97,7 +97,7 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
     }
 
     return (
-        <Card className="h-[96%] w-full ml-8">
+        <Card className="h-full w-full">
             <CardHeader>
                 <CardTitle>Current Reservation</CardTitle>
                 <CardDescription>
@@ -147,16 +147,16 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
                         <Label>Public Key:</Label> <Input value={reservation.publicKey} readOnly />
                     </div>
                     {error && <div className="text-red-500 text-xs">{error}</div>}
-                    <div className="flex gap-2 mt-4">
+                    <div className="flex gap-2 mt-4 w-full">
                         {isPrivate ? (
                             editing ? (
                                 <>
-                                    <Button type="submit" disabled={saving}>{saving ? "Saving..." : "Save"}</Button>
-                                    <Button type="button" variant="secondary" onClick={() => { setEditing(false); setEditData(reservation); }}>Cancel</Button>
+                                    <Button className={"w-1/2"} type="submit" disabled={saving}>{saving ? "Saving..." : "Save"}</Button>
+                                    <Button className={"w-1/2"} type="button" variant="secondary" onClick={() => { setEditing(false); setEditData(reservation); }}>Cancel</Button>
                                 </>
                             ) : (
                                 <>
-                                    <Button type="button" onClick={() => { setEditing(true); setEditData(reservation); }}><LucideEdit2/>Edit</Button>
+                                    <Button className={"w-full"} type="button" onClick={() => { setEditing(true); setEditData(reservation); }}><LucideEdit2/>Edit</Button>
                                 </>
                             )
                         ) : (
