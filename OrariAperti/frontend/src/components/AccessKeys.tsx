@@ -45,7 +45,7 @@ export default function AccessKeys({ onReservationLoaded }: { onReservationLoade
 
     return (
         <>
-            <Card className={"h-[96%] w-[30%]"}>
+            <Card className={"h-[108vh] w-[30%]"}>
                 <CardHeader>
                     <CardTitle>Access Keys</CardTitle>
                     <CardDescription>Enter your Access Keys to view or edit your reservations.</CardDescription>
