@@ -77,7 +77,7 @@ export default function AccessKeys({ onReservationLoaded }: { onReservationLoade
                             </div>
                         </div>
                     </CardContent>
-                    <CardFooter className={"flex-col gap-2"}>
+                    <CardFooter className={"mt-[150%]"}>
                         <Button type={"submit"} variant={"default"} className={"w-full"} disabled={loading}>{loading ? "Loading..." : "Load Reservations"}</Button>
                     </CardFooter>
                 </form>
