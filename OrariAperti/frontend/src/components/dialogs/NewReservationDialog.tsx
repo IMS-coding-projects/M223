@@ -219,7 +219,7 @@ function NewReservation({
                         </PopoverContent>
                     </Popover>
                     {errors.date && (
-                        <span className="text-red-500 text-xs">{errors.date.message}</span>
+                        <span className="text-destructive text-xs">{errors.date.message}</span>
                     )}
                 </div>
                 {/* Room Field */}
@@ -264,7 +264,7 @@ function NewReservation({
                         </SelectContent>
                     </Select>
                     {errors.roomId && (
-                        <span className="text-red-500 text-xs">
+                        <span className="text-destructive text-xs">
                             {errors.roomId.message}
                         </span>
                     )}
@@ -302,7 +302,7 @@ function NewReservation({
                         </SelectContent>
                     </Select>
                     {errors.startTime && (
-                        <span className="text-red-500 text-xs">
+                        <span className="text-destructive text-xs">
                             {errors.startTime.message}
                         </span>
                     )}
@@ -340,7 +340,7 @@ function NewReservation({
                         </SelectContent>
                     </Select>
                     {errors.endTime && (
-                        <span className="text-red-500 text-xs">
+                        <span className="text-destructive text-xs">
                             {errors.endTime.message}
                         </span>
                     )}
@@ -358,7 +358,7 @@ function NewReservation({
                     className="resize-none"
                 />
                 {errors.description && (
-                    <span className="text-red-500 text-xs">
+                    <span className="text-destructive text-xs">
                         {errors.description.message}
                     </span>
                 )}
@@ -381,7 +381,7 @@ function NewReservation({
                     })}
                 />
                 {errors.participants && (
-                    <span className="text-red-500 text-xs">
+                    <span className="text-destructive text-xs">
                         {errors.participants.message}
                     </span>
                 )}

@@ -14,7 +14,7 @@ import {useState, useEffect} from "react";
 import type {Reservation, Room, ReservationDTO} from "@/types/types";
 import NewReservationDialog from "@/components/dialogs/NewReservationDialog";
 import {toast} from "sonner";
-import {CalendarIcon, CircleX, LucideEdit2, LucideLink, Save} from "lucide-react";
+import {CalendarIcon, CircleX, Globe, LucideEdit2, LucideLink, Save, Shield, LucideTriangleAlert} from "lucide-react";
 import {FeatureBadge} from "@/components/FeatureBadge";
 import {format} from "date-fns";
 import DeleteSingleReservationDialog from "@/components/dialogs/DeleteSingleReservationDialog.tsx";
@@ -22,6 +22,8 @@ import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover.t
 import {Calendar} from "@/components/ui/calendar.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {useForm} from "react-hook-form";
+import {HoverCard, HoverCardTrigger, HoverCardContent} from "@/components/ui/hover-card.tsx";
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx";
 
 const API_URL = import.meta.env.VITE_APP_BACKEND_URL;
 
@@ -135,7 +137,7 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
             setSaving(false);
             return;
         }
-        
+
         try {
             const payload = {
                 ...data,
@@ -152,7 +154,10 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
                 const msg = await res.text();
                 throw new Error(msg || "Failed to update reservation");
             }
-            toast.success("Reservation updated!", {description: "The site will refresh automatically in 4.5 seconds to show the accurate information...", duration: 4500});
+            toast.success("Reservation updated!", {
+                description: "The site will refresh automatically in 4.5 seconds to show the accurate information...",
+                duration: 4500
+            });
             const url = new URL(window.location.href);
             url.searchParams.set("privateKey", reservation?.privateKey || "");
             url.searchParams.delete("publicKey");
@@ -190,7 +195,7 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
             setTimeout(() => {
                 window.location.href = "/";
             }, 3000);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
             toast.error(err.message || "Failed to delete reservation");
         } finally {
@@ -266,7 +271,7 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
                                     </PopoverContent>
                                 </Popover>
                                 {errors.date && (
-                                    <span className="text-red-500 text-xs">{errors.date.message}</span>
+                                    <span className="text-destructive text-xs">{errors.date.message}</span>
                                 )}
                             </div>
                             {/* Room Field */}
@@ -311,7 +316,7 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
                                     </SelectContent>
                                 </Select>
                                 {errors.roomId && (
-                                    <span className="text-red-500 text-xs">
+                                    <span className="text-destructive text-xs">
                                         {errors.roomId.message}
                                     </span>
                                 )}
@@ -334,7 +339,8 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
                                             },
                                         })}
                                     >
-                                        <SelectValue defaultValue={reservation.startTime.substring(0, reservation.startTime.length - 3)} />
+                                        <SelectValue
+                                            defaultValue={reservation.startTime.substring(0, reservation.startTime.length - 3)}/>
                                     </SelectTrigger>
                                     <SelectContent>
                                         {Array.from({length: 31}, (_, i) => {
@@ -350,7 +356,7 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
                                     </SelectContent>
                                 </Select>
                                 {errors.startTime && (
-                                    <span className="text-red-500 text-xs">
+                                    <span className="text-destructive text-xs">
                                         {errors.startTime.message}
                                     </span>
                                 )}
@@ -373,7 +379,8 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
                                             },
                                         })}
                                     >
-                                        <SelectValue defaultValue={reservation.endTime.substring(0, reservation.endTime.length - 3)}/>
+                                        <SelectValue
+                                            defaultValue={reservation.endTime.substring(0, reservation.endTime.length - 3)}/>
                                     </SelectTrigger>
                                     <SelectContent>
                                         {Array.from({length: 31}, (_, i) => {
@@ -389,7 +396,7 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
                                     </SelectContent>
                                 </Select>
                                 {errors.endTime && (
-                                    <span className="text-red-500 text-xs">
+                                    <span className="text-destructive text-xs">
                                         {errors.endTime.message}
                                     </span>
                                 )}
@@ -407,7 +414,7 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
                                 className="resize-none"
                             />
                             {errors.description && (
-                                <span className="text-red-500 text-xs">
+                                <span className="text-destructive text-xs">
                                     {errors.description.message}
                                 </span>
                             )}
@@ -430,7 +437,7 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
                                 })}
                             />
                             {errors.participants && (
-                                <span className="text-red-500 text-xs">
+                                <span className="text-destructive text-xs">
                                     {errors.participants.message}
                                 </span>
                             )}
@@ -498,37 +505,77 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
                     <div>
                         <div className="flex flex-col gap-1">
                             {reservation.privateKey && (
+
                                 <>
-                                    <Label htmlFor={"privatekey-input-current"} className={"cursor-pointer"}>Private
-                                                                                                             Key</Label>
-                                    <Input
-                                        id="privatekey-input-current"
-                                        type="text"
-                                        value={reservation.privateKey}
-                                        readOnly
-                                        className="bg-muted mb-3 cursor-pointer select-all"
-                                        onClick={e => {
-                                            (e.target as HTMLInputElement).select();
-                                            navigator.clipboard.writeText(reservation.privateKey).then();
-                                            toast.success("Private key copied to clipboard!");
-                                        }}/>
+                                    <HoverCard>
+                                        <HoverCardTrigger asChild>
+                                            <div>
+                                                <Label htmlFor={"privatekey-input-current"}
+                                                       className={"cursor-pointer"}>Private Key</Label>
+                                                <Input
+                                                    id="privatekey-input-current"
+                                                    type="text"
+                                                    value={reservation.privateKey}
+                                                    readOnly
+                                                    className="bg-muted mb-3 cursor-pointer select-all"
+                                                    onClick={e => {
+                                                        (e.target as HTMLInputElement).select();
+                                                        navigator.clipboard.writeText(reservation.privateKey).then();
+                                                        toast.success("Private key copied to clipboard!");
+                                                    }}/>
+                                            </div>
+                                        </HoverCardTrigger>
+                                        <HoverCardContent asChild>
+                                            <Alert variant={"destructive"}>
+                                                <AlertTitle className={"text-xs flex gap-1 text-destructive"}>
+                                                    <LucideTriangleAlert size={30} className={"mt-[1px]"}/>
+                                                    Never share your private key with anyone.
+                                                </AlertTitle>
+                                                <AlertDescription className={"text-xs"}>
+                                                    It is used to securely access and manage your reservations.
+                                                    Sharing it will allow others to edit or delete your reservations.
+                                                </AlertDescription>
+                                            </Alert>
+                                        </HoverCardContent>
+                                    </HoverCard>
                                 </>
                             )}
                             {reservation.publicKey && (
                                 <>
-                                    <Label htmlFor={"publickey-input-current"} className={"cursor-pointer"}>Public
-                                                                                                            Key</Label>
-                                    <Input
-                                        id="publickey-input-current"
-                                        type="text"
-                                        value={reservation.publicKey}
-                                        readOnly
-                                        className="bg-muted cursor-pointer select-all"
-                                        onClick={e => {
-                                            (e.target as HTMLInputElement).select();
-                                            navigator.clipboard.writeText(reservation.publicKey).then();
-                                            toast.success("Public key copied to clipboard!");
-                                        }}/>
+                                    <HoverCard>
+                                        <HoverCardTrigger asChild>
+                                            <div>
+                                                <Label htmlFor={"publickey-input-current"} className={"cursor-pointer"}>Public
+                                                                                                                        Key</Label>
+                                                <Input
+                                                    id="publickey-input-current"
+                                                    type="text"
+                                                    value={reservation.publicKey}
+                                                    readOnly
+                                                    className="bg-muted cursor-pointer select-all"
+                                                    onClick={e => {
+                                                        (e.target as HTMLInputElement).select();
+                                                        navigator.clipboard.writeText(reservation.publicKey).then();
+                                                        toast.success("Public key copied to clipboard!");
+                                                    }}/>
+                                            </div>
+                                        </HoverCardTrigger>
+                                        <HoverCardContent asChild onClick={() => {
+                                            handleCopyLink()
+                                        }} className={"hover:cursor-pointer"}>
+                                            <Alert>
+                                                <AlertTitle className={"text-xs flex gap-1"}>
+                                                    <LucideLink size={15}/>
+                                                    Share your public key
+                                                </AlertTitle>
+                                                <AlertDescription className={"text-xs"}>
+                                                    Share your public key with others to allow them to view your
+                                                    reservations without giving them access to manage them. You can
+                                                    click on me to copy it to your clipboard.
+                                                </AlertDescription>
+                                            </Alert>
+                                        </HoverCardContent>
+                                    </HoverCard>
                                 </>
                             )}
                         </div>

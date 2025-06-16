@@ -61,7 +61,7 @@ public class ReservationController {
             }
             Room room = roomRepository.findById(reservationDTO.getRoomId()).orElse(null);
             if (room == null) {
-                throw new Exception("Room not found.");
+                throw new Exception("Room not found. Please hard reload the page (ctrl + F5)");
             }
             for (Reservation reservation : reservationRepository.findAll()) {
                 boolean isSameRoom = reservation.getRoom().getId().equals(room.getId());
@@ -117,7 +117,7 @@ public class ReservationController {
             }
             Room room = roomRepository.findById(reservationDTO.getRoomId()).orElse(null);
             if (room == null) {
-                throw new Exception("Room not found.");
+                throw new Exception("Room not found. Please hard reload the page (ctrl + F5)");
             }
             for (Reservation currentReservationFromDB : reservationRepository.findAll()) {
                 boolean isSameRoom = currentReservationFromDB.getRoom().getId().equals(room.getId());

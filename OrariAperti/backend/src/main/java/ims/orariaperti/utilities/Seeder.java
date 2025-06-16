@@ -71,6 +71,7 @@ public class Seeder implements CommandLineRunner {
             Room room320 = roomRepository.save(new Room(null, "320", new ArrayList<>(Arrays.asList(RoomFeatures.BEAMER, RoomFeatures.PRINTER))));
             @SuppressWarnings("unused")
             Room room330 = roomRepository.save(new Room(null, "330", new ArrayList<>(Arrays.asList(RoomFeatures.BEAMER, RoomFeatures.LOCKERS, RoomFeatures.WIFI))));
+            @SuppressWarnings("unused")
             Room room340 = roomRepository.save(new Room(null, "340", new ArrayList<>(Arrays.asList(RoomFeatures.BEAMER, RoomFeatures.WHITEBOARD, RoomFeatures.AIR_CONDITIONING, RoomFeatures.POWER_OUTLETS))));
             System.out.println("Sample Rooms have been added to the database.");
 
@@ -82,7 +83,7 @@ public class Seeder implements CommandLineRunner {
                         LocalTime.of(10, 0),
                         room101,
                         "Team Meeting",
-                        "Tom,Johnson",
+                        "Tom, Johnson",
                         UUID.randomUUID(),
                         UUID.randomUUID()
                 ));
@@ -93,7 +94,7 @@ public class Seeder implements CommandLineRunner {
                         LocalTime.of(12, 0),
                         room102,
                         "Project Discussion",
-                        "Mac,Fluury",
+                        "Mac, Fluury",
                         UUID.randomUUID(),
                         UUID.randomUUID()
                 ));
@@ -104,7 +105,7 @@ public class Seeder implements CommandLineRunner {
                         LocalTime.of(12, 0),
                         room102,
                         "Project Feedback",
-                        "Pluh,Tompson",
+                        "Pluh, Tompson",
                         UUID.randomUUID(),
                         UUID.randomUUID()
                 ));
