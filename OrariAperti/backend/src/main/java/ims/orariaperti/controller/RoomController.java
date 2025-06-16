@@ -8,14 +8,12 @@ import ims.orariaperti.utilities.RoomFeatures;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Repository
 @RequestMapping("/api/room")
@@ -23,11 +21,9 @@ import java.util.UUID;
 public class RoomController {
     
     private final RoomRepository roomRepository;
-    private final ReservationRepository reservationRepository;
 
-    public RoomController(RoomRepository roomRepository, ReservationRepository reservationRepository) {
+    public RoomController(RoomRepository roomRepository) {
         this.roomRepository = roomRepository;
-        this.reservationRepository = reservationRepository;
     }
     
     @GetMapping
@@ -47,17 +43,4 @@ public class RoomController {
             return ResponseEntity.notFound().build();
         }
     }
-
-    @GetMapping("/{roomId}/reservations")
-    public ResponseEntity<?> getReservationsForRoom(@PathVariable UUID roomId) {
-        var roomOpt = roomRepository.findById(roomId);
-        if (roomOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        List<Reservation> reservations = reservationRepository.findAll().stream()
-            .filter(r -> r.getRoom() != null && r.getRoom().getId().equals(roomId))
-            .toList();
-        return ResponseEntity.ok(reservations);
-    }
-
 }

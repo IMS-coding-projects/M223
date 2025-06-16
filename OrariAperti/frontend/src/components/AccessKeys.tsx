@@ -72,7 +72,7 @@ export default function AccessKeys({
                 </CardHeader>
                 <form className="flex flex-col h-full" onSubmit={handleSubmit}>
                     <CardContent className="flex-grow">
-                        <div className="grid gap-4">
+                        <div className="grid gap-6">
                             <div className="grid gap-2">
                                 <Label htmlFor="privateKey"><Shield size={16}/> Private Key</Label>
                                 <Input

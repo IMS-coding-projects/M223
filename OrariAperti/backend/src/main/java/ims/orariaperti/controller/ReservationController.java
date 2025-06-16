@@ -6,7 +6,6 @@ import ims.orariaperti.entity.Room;
 import ims.orariaperti.repository.ReservationRepository;
 import ims.orariaperti.repository.RoomRepository;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -26,12 +25,12 @@ public class ReservationController {
     }
 
     @GetMapping
-    public Object getReservations(@RequestHeader(required = false) UUID publickey, @RequestHeader(required = false) UUID privatekey) {
+    public ResponseEntity<?> getReservations(@RequestHeader(required = false) UUID publickey, @RequestHeader(required = false) UUID privatekey) {
         if (publickey == null && privatekey == null) {
             return ResponseEntity.badRequest().build();
         }
         if (privatekey != null) {
-            Optional<Object> reservationInDB = reservationRepository.findByPrivateKey(privatekey);
+            Optional<?> reservationInDB = reservationRepository.findByPrivateKey(privatekey);
             if (reservationInDB.isPresent() && reservationInDB.get() instanceof Reservation reservation) {
                 return ResponseEntity.ok(Map.of(
                     "reservationDetails", reservation,
@@ -42,7 +41,7 @@ public class ReservationController {
                 return ResponseEntity.notFound().build();
             }
         } else {
-            Optional<Object> reservationInDB = reservationRepository.findByPublicKey(publickey);
+            Optional<?> reservationInDB = reservationRepository.findByPublicKey(publickey);
             if (reservationInDB.isPresent() && reservationInDB.get() instanceof Reservation reservation) {
                 return ResponseEntity.ok(Map.of(
                     "reservationDetails", reservation,
@@ -55,7 +54,7 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createReservation(@RequestBody ReservationDTO reservationDTO) {
+    public ResponseEntity<?> createReservation(@RequestBody ReservationDTO reservationDTO) {
         try {
             if (!reservationDTO.getParticipants().matches("^[A-Za-zÄäÖöÜüßèéêç ]+(, *[A-Za-zÄäÖöÜüßèéêç ]+)*$")) {
                 throw new Exception("Participants field must only contain letters (A-Z, a-z) separated by commas.");
@@ -85,7 +84,10 @@ public class ReservationController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReservation(@PathVariable UUID id, @RequestHeader UUID privateKey) {
+    public ResponseEntity<?> deleteReservation(@PathVariable UUID id, @RequestHeader(required = false) UUID privateKey) {
+        if (privateKey == null) {
+            return ResponseEntity.status(401).body("Private key is required for deleting a reservation.");
+        }
         Reservation reservation = reservationRepository.getFirstById(id);
         if (reservation == null) {
             return ResponseEntity.notFound().build();
@@ -98,7 +100,10 @@ public class ReservationController {
     }
 
     @PutMapping("/{id}")
-    public Object updateReservation(@PathVariable UUID id, @RequestBody ReservationDTO reservationDTO, @RequestHeader UUID privateKey) {
+    public ResponseEntity<?> updateReservation(@PathVariable UUID id, @RequestBody ReservationDTO reservationDTO, @RequestHeader(required = false) UUID privateKey) {
+        if (privateKey == null) {
+            return ResponseEntity.status(401).body("Private key is required for updating a reservation.");
+        }
         try {
             Reservation reservation = reservationRepository.getFirstById(id);
             if (reservation == null) {
