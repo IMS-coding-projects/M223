@@ -109,7 +109,6 @@ export default function NewReservationDialog() {
             // modify the current location URL to include the private key and reload the page
             const newUrl = new URL(window.location.href);
             newUrl.searchParams.set("privateKey", res.data.privateKey);
-            newUrl.searchParams.set("publicKey", res.data.publicKey);
             window.history.pushState({}, "", newUrl.toString());
             window.location.reload();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
