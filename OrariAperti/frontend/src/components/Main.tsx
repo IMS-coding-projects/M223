@@ -2,6 +2,8 @@ import { useState } from "react";
 import AccessKeys from "@/components/AccessKeys.tsx";
 import CurrentReservation from "@/components/CurrentReservation.tsx";
 import type { Reservation } from "@/types/types";
+import { Separator } from "@/components/ui/separator.tsx";
+import FAQAccordion from "@/components/FAQAccordion.tsx";
 
 function getQueryParam(param: string) {
     const params = new URLSearchParams(window.location.search);
@@ -21,18 +23,20 @@ export default function MainUIOnly() {
 
     return (
         <main className="container mx-auto p-6 w-full">
-            <div className="flex flex-col md:flex-row gap-6 min-h-[calc(100vh-100px)]">
+            <div className="flex flex-col md:flex-row gap-6">
                 <div className="w-full md:w-1/3 flex-shrink-0 h-full md:h-auto">
                     <AccessKeys
                         onReservationLoaded={setReservation}
                         publicKey={publicKey || undefined}
                         privateKey={privateKey || undefined}
                     />
-                </div>
+                </div>      
                 <div className="w-full md:w-2/3 flex-grow h-full md:h-auto">
                     <CurrentReservation reservation={reservation}/>
                 </div>
             </div>
+            <Separator className="my-4" />
+            <FAQAccordion/>
         </main>
     );
 }
