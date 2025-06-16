@@ -33,7 +33,6 @@ import {
 import { format } from "date-fns";
 import { toast } from "sonner";
 import {FeatureBadge} from "../FeatureBadge.tsx";
-import AccessKeys from "@/components/AccessKeys"; // adjust path as needed
 
 export default function NewReservationDialog() {
     const {
@@ -50,7 +49,6 @@ export default function NewReservationDialog() {
 
     const [rooms, setRooms] = useState<Room[]>([]);
     const [loadingRooms, setLoadingRooms] = useState(false);
-    const [accessKeys, setAccessKeys] = useState<{privateKey: string, publicKey: string} | null>(null);
     const [dialogOpen, setDialogOpen] = useState(false);
 
     useEffect(() => {
@@ -71,6 +69,21 @@ export default function NewReservationDialog() {
             toast.error("Please select a date.");
             return;
         }
+
+        const now = new Date();
+        const [year, month, day] = data.date.split("-");
+        const [hour, minute] = data.startTime.split(":");
+        const reservationStart = new Date(
+            Number(year),
+            Number(month) - 1,
+            Number(day),
+            Number(hour),
+            Number(minute)
+        );
+        if (reservationStart < now) {
+            toast.error("Reservation cannot be in the past.");
+            return;
+        }
         const payload = {
             ...data,
             roomId: data.roomId,
@@ -85,18 +98,20 @@ export default function NewReservationDialog() {
             import.meta.env.VITE_APP_BACKEND_URL + "/api/reservation",
             payload
             );
-            if (typeof res.data === "string") {
-            // Backend returned an error as a string
-            toast.error(res.data);
-            return;
+            if (typeof res.data === "string" && res.status !== 200) {
+                // Backend returned an error as a string
+                toast.error(res.data);
+                return;
             }
-            toast.success("Reservation succesfully created!");
-            reset();
-            setAccessKeys({
-            privateKey: res.data.privateKey,
-            publicKey: res.data.publicKey
-            });
+            toast.success("Reservation successfully created!");
             setDialogOpen(false);
+            reset();
+            // modify the current location URL to include the private key and reload the page
+            const newUrl = new URL(window.location.href);
+            newUrl.searchParams.set("privateKey", res.data.privateKey);
+            newUrl.searchParams.set("publicKey", res.data.publicKey);
+            window.history.pushState({}, "", newUrl.toString());
+            window.location.reload();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             const errorMessage =
@@ -107,12 +122,6 @@ export default function NewReservationDialog() {
             toast.error(errorMessage);
         }
     };
-
-    // When dialog closes, clear keys
-    useEffect(() => {
-        if (!dialogOpen) setAccessKeys(null);
-    }, [dialogOpen]);
-
     return (
         <>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -150,13 +159,6 @@ export default function NewReservationDialog() {
                     </form>
                 </DialogContent>
             </Dialog>
-            {accessKeys && (
-                <AccessKeys
-                    privateKey={accessKeys.privateKey}
-                    publicKey={accessKeys.publicKey}
-                    onLoad={() => {/* Optionally trigger load logic here */}}
-                />
-            )}
         </>
     );
 }
@@ -176,7 +178,6 @@ function NewReservation({
     rooms: Room[];
     loadingRooms: boolean;
 }) {
-    // Get the selected roomId from the form state
     const selectedRoomId = watch("roomId");
     const selectedRoom = rooms.find((room) => room.id === selectedRoomId);
 
@@ -191,7 +192,7 @@ function NewReservation({
                             <Button
                                 variant="outline"
                                 data-empty={!watch("date")}
-                                className="data-[empty=true]:text-muted-foreground w-[280px] justify-start text-left font-normal"
+                                className="data-[empty=true]:text-muted-foreground w-full justify-start text-left font-normal"
                             >
                                 <CalendarIcon />
                                 {watch("date") ? (
@@ -206,7 +207,7 @@ function NewReservation({
                                 mode="single"
                                 selected={watch("date") ? new Date(watch("date")) : undefined}
                                 disabled={(date) =>
-                                    date < new Date() /* || date.getDay() === 0 || date.getDay() === 6*/ // TODO: Disable weekends if needed check with others
+                                    date < new Date(new Date().setHours(0, 0, 0, 0)) /* || date.getDay() === 0 || date.getDay() === 6*/ // TODO: Disable weekends if needed check with others
                                 }
                                 onSelect={(date) => {
                                     if (date) {

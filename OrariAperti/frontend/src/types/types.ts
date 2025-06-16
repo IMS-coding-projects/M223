@@ -2,15 +2,16 @@ export interface ReservationDTO {
     date: string;
     startTime: string;
     endTime: string;
-    roomId: string; 
+    roomId: string;
     description: string;
     participants: string;
 }
 
 export interface Reservation extends ReservationDTO {
     id: string;
-    privateKey: string; 
+    privateKey: string;
     publicKey: string;
+    room?: Room;
 }
 
 export type Room = {
