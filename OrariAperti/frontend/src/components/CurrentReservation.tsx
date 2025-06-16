@@ -11,57 +11,86 @@ import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/textarea";
 import {useState, useEffect} from "react";
-import type {Reservation, Room} from "@/types/types";
+import type {Reservation, Room, ReservationDTO} from "@/types/types";
 import NewReservationDialog from "@/components/dialogs/NewReservationDialog";
 import {toast} from "sonner";
-import {CircleX, LucideEdit2, LucideLink, Save} from "lucide-react";
+import {CalendarIcon, CircleX, LucideEdit2, LucideLink, Save} from "lucide-react";
 import {FeatureBadge} from "@/components/FeatureBadge";
 import {format} from "date-fns";
 import DeleteSingleReservationDialog from "@/components/dialogs/DeleteSingleReservationDialog.tsx";
+import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover.tsx";
+import {Calendar} from "@/components/ui/calendar.tsx";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
+import {useForm} from "react-hook-form";
 
 const API_URL = import.meta.env.VITE_APP_BACKEND_URL;
 
-function getQueryParam(param: string) {
-    const params = new URLSearchParams(window.location.search);
-    for (const [key, value] of params.entries()) {
-        if (key.toLowerCase() === param.toLowerCase()) {
-            return value;
-        }
-    }
-    return undefined;
+function formatDateString(dateString: string | Date): string {
+    const date = new Date(dateString);
+    return (
+        date.toLocaleString("default", {year: "numeric"}) +
+        "-" +
+        date.toLocaleString("default", {month: "2-digit"}) +
+        "-" +
+        date.toLocaleString("default", {day: "2-digit"})
+    );
 }
 
 export default function CurrentReservation({reservation}: { reservation?: Reservation }) {
-    const [editData, setEditData] = useState<Reservation | undefined>(reservation);
     const [editing, setEditing] = useState(false);
     const [saving, setSaving] = useState(false);
     const [deleting, setDeleting] = useState(false);
     const [rooms, setRooms] = useState<Room[]>([]);
-    const [error, setError] = useState<string | null>(null);
+    const [loadingRooms, setLoadingRooms] = useState(false);
 
-    const privateKey = getQueryParam("privateKey");
-    // @ts-expect-error: Comparing DOM element to reservation.privateKey for access control
-    const isPrivate = !!reservation && document.querySelector('#privateKey').value === reservation.privateKey;
+    const isPrivate = !!reservation && (document.querySelector<HTMLInputElement>('#privateKey')?.value === reservation.privateKey);
 
-    useEffect(() => {
-        setEditData(reservation);
-    }, [reservation]);
+    const {
+        register,
+        handleSubmit,
+        watch,
+        setValue,
+        formState: {errors},
+        reset,
+    } = useForm<ReservationDTO>({
+        mode: "onBlur",
+        reValidateMode: "onChange",
+        defaultValues: reservation
+            ? {
+                date: reservation.date,
+                startTime: reservation.startTime.substring(0, reservation.startTime.length - 3),
+                endTime: reservation.endTime.substring(0, reservation.endTime.length - 3),
+                roomId: reservation.room?.id ?? "",
+                description: reservation.description,
+                participants: reservation.participants,
+            }
+            : undefined,
+    });
 
     useEffect(() => {
         if (editing) {
-            fetchRooms().then();
+            setLoadingRooms(true);
+            fetch(`${API_URL}/api/room`)
+                .then(res => res.json())
+                .then(setRooms)
+                .catch(() => toast.error("Failed to load rooms"))
+                .finally(() => setLoadingRooms(false));
         }
     }, [editing]);
 
-    async function fetchRooms() {
-        try {
-            const res = await fetch(`${API_URL}/api/room`);
-            if (!res.ok) throw new Error("Failed to load rooms");
-            setRooms(await res.json());
-        } catch {
-            toast.error("Failed to load rooms");
+    useEffect(() => {
+        // Reset form when reservation changes
+        if (reservation) {
+            reset({
+                date: reservation.date,
+                startTime: reservation.startTime.substring(0, reservation.startTime.length - 3),
+                endTime: reservation.endTime.substring(0, reservation.endTime.length - 3),
+                roomId: reservation.room?.id ?? "",
+                description: reservation.description,
+                participants: reservation.participants,
+            });
         }
-    }
+    }, [reservation, reset]);
 
     function handleCopyLink() {
         const url = new URL(window.location.href);
@@ -73,25 +102,49 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
         toast.success("Shareable link copied!");
     }
 
-    async function handleSave(e: React.FormEvent) {
-        e.preventDefault();
-        if (!editData) return;
+    async function onEditSubmit(data: ReservationDTO) {
         setSaving(true);
-        setError(null);
+        if (!reservation) {
+            toast.error("No reservation to update");
+            setSaving(false);
+            return;
+        }
+        // Validate date
+        if (!data.date || !data.startTime || !data.endTime) {
+            toast.error("Please fill in all required fields");
+            setSaving(false);
+            return;
+        }
+        const now = new Date();
+        const [year, month, day] = data.date.split("-");
+        const [hour, minute] = data.startTime.split(":");
+        const reservationStart = new Date(
+            Number(year),
+            Number(month) - 1,
+            Number(day),
+            Number(hour),
+            Number(minute)
+        );
+        if (reservationStart < now) {
+            toast.error("Reservation cannot be in the past.");
+            setSaving(false);
+            return;
+        }
+        if (data.startTime >= data.endTime) {
+            toast.error("End time must be after start time");
+            setSaving(false);
+            return;
+        }
+        
         try {
             const payload = {
-                date: editData.date,
-                startTime: editData.startTime,
-                endTime: editData.endTime,
-                roomId: editData.room?.id,
-                description: editData.description,
-                participants: editData.participants,
+                ...data,
             };
-            const res = await fetch(`${API_URL}/api/reservation/${editData.id}`, {
+            const res = await fetch(`${API_URL}/api/reservation/${reservation?.id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
-                    privateKey: privateKey || "",
+                    privateKey: reservation?.privateKey || "",
                 },
                 body: JSON.stringify(payload),
             });
@@ -99,18 +152,17 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
                 const msg = await res.text();
                 throw new Error(msg || "Failed to update reservation");
             }
-            const updated = await res.json();
-            setEditing(false);
-            setEditData(updated);
-            toast.success("Reservation updated!");
+            toast.success("Reservation updated!", {description: "The site will refresh automatically in 4.5 seconds to show the accurate information...", duration: 4500});
             const url = new URL(window.location.href);
-            url.searchParams.set("privateKey", updated.privateKey);
+            url.searchParams.set("privateKey", reservation?.privateKey || "");
+            url.searchParams.delete("publicKey");
             window.history.replaceState({}, "", url.toString());
-            window.location.reload();
+            setTimeout(() => {
+                window.location.reload();
+            }, 3000);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
-            setError(err?.message || "Failed to update reservation");
-            toast.error(error);
+            toast.error(err?.message || "Failed to update reservation");
         } finally {
             setSaving(false);
         }
@@ -119,30 +171,28 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
     async function handleDelete() {
         if (!reservation) return;
         setDeleting(true);
-        setError(null);
         try {
             const res = await fetch(`${API_URL}/api/reservation/${reservation.id}`, {
                 method: "DELETE",
                 headers: {
-                    privateKey: privateKey || "",
+                    privateKey: reservation?.privateKey || "",
                 },
             });
             if (!res.ok) {
                 const msg = await res.text();
                 throw new Error(msg || "Failed to delete reservation");
             }
-            toast.success("Reservation deleted!");
-            setEditData(undefined);
-            setEditing(false);
+            toast.success("Reservation deleted!", {description: "Redirecting to home in 3 seconds...", duration: 3000});
             const url = new URL(window.location.href);
             url.searchParams.delete("privateKey");
             url.searchParams.delete("publicKey");
             window.history.replaceState({}, "", url.toString());
-            window.location.reload();
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            setTimeout(() => {
+                window.location.href = "/";
+            }, 3000);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
-            setError(err.message || "Failed to delete reservation");
-            toast.error(error);
+            toast.error(err.message || "Failed to delete reservation");
         } finally {
             setDeleting(false);
         }
@@ -164,100 +214,230 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
         );
     }
 
-    if (editing && editData) {
+    if (editing) {
+        const selectedRoomId = watch("roomId");
+        const selectedRoom = rooms.find((room) => room.id === selectedRoomId);
+
         return (
             <Card className="h-full w-full">
-                <form onSubmit={handleSave}>
+                <form onSubmit={handleSubmit(onEditSubmit)}>
                     <CardHeader className={"mb-4"}>
                         <CardTitle>Edit Reservation</CardTitle>
                         <CardDescription>
                             Update your reservation details below.
                         </CardDescription>
-                        <CardAction>
-                            <Button
-                                variant="secondary"
-                                onClick={() => setEditing(false)}
-                                title="Cancel editing"
-                            >
-                                <CircleX/>Cancel Editing
-                            </Button>
-                        </CardAction>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div>
-                            <Label>Date</Label>
-                            <Input
-                                type="date"
-                                value={editData.date}
-                                onChange={e => setEditData({...editData, date: e.target.value})}
-                                required
-                            />
-                        </div>
-                        <div>
-                            <Label>Room</Label>
-                            <select
-                                className="w-full border rounded px-2 py-2"
-                                value={editData.room?.id || ""}
-                                onChange={e => {
-                                    const room = rooms.find(r => r.id === e.target.value);
-                                    setEditData({...editData, room});
-                                }}
-                                required
-                            >
-                                <option value="" disabled>Select a room</option>
-                                {rooms.map(room => (
-                                    <option key={room.id} value={room.id}>
-                                        Room {room.roomNumber}
-                                    </option>
-                                ))}
-                            </select>
-                            {editData.room?.roomFeatures && (
-                                <div className="flex flex-wrap gap-1 mt-2">
-                                    {editData.room.roomFeatures.map(f => (
-                                        <FeatureBadge key={f} feature={f}/>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                        <div className="flex gap-4">
-                            <div className="flex-1">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Date Field */}
+                            <div className="flex flex-col">
+                                <Label>Date</Label>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            variant="outline"
+                                            data-empty={!watch("date")}
+                                            className="data-[empty=true]:text-muted-foreground w-full justify-start text-left font-normal"
+                                            type="button"
+                                        >
+                                            <CalendarIcon/>
+                                            {watch("date") ? (
+                                                format(new Date(watch("date")), "PPP")
+                                            ) : (
+                                                <span>Pick a date</span>
+                                            )}
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0">
+                                        <Calendar
+                                            mode="single"
+                                            selected={watch("date") ? new Date(watch("date")) : undefined}
+                                            disabled={(date) =>
+                                                date < new Date(new Date().setHours(0, 0, 0, 0))
+                                            }
+                                            onSelect={(date) => {
+                                                if (date) {
+                                                    setValue("date", formatDateString(date), {
+                                                        shouldValidate: true,
+                                                    });
+                                                }
+                                            }}
+                                        />
+                                    </PopoverContent>
+                                </Popover>
+                                {errors.date && (
+                                    <span className="text-red-500 text-xs">{errors.date.message}</span>
+                                )}
+                            </div>
+                            {/* Room Field */}
+                            <div>
+                                <Label>Room</Label>
+                                <Select
+                                    onValueChange={(val) =>
+                                        setValue("roomId", val, {shouldValidate: true})
+                                    }
+                                    disabled={loadingRooms}
+                                    value={selectedRoomId}
+                                >
+                                    <SelectTrigger
+                                        {...register("roomId", {
+                                            required: "Room is required",
+                                        })}
+                                    >
+                                        <span>
+                                            {selectedRoom
+                                                ? `Room ${selectedRoom.roomNumber}`
+                                                : loadingRooms
+                                                    ? "Loading rooms..."
+                                                    : "Select a room"}
+                                        </span>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {rooms
+                                            .slice()
+                                            .sort((a, b) => Number(a.roomNumber) - Number(b.roomNumber))
+                                            .map((room) => (
+                                                <SelectItem key={room.id} value={room.id}>
+                                                    <div className="flex flex-col gap-1">
+                                                        <span className="font-medium">Room {room.roomNumber}</span>
+                                                        <div className="flex flex-wrap gap-1 mt-1">
+                                                            {room.roomFeatures.map((feature) => (
+                                                                <FeatureBadge key={feature} feature={feature}/>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                </SelectItem>
+                                            ))}
+                                    </SelectContent>
+                                </Select>
+                                {errors.roomId && (
+                                    <span className="text-red-500 text-xs">
+                                        {errors.roomId.message}
+                                    </span>
+                                )}
+                            </div>
+                            {/* Start Time Field */}
+                            <div>
                                 <Label>Start Time</Label>
-                                <Input
-                                    type="time"
-                                    value={editData.startTime}
-                                    onChange={e => setEditData({...editData, startTime: e.target.value})}
-                                    required
-                                />
+                                <Select
+                                    onValueChange={(val) =>
+                                        setValue("startTime", val, {shouldValidate: true})
+                                    }
+                                    value={watch("startTime")}
+                                >
+                                    <SelectTrigger
+                                        {...register("startTime", {
+                                            required: "Start time is required",
+                                            pattern: {
+                                                value: /^([01]\d|2[0-3]):[0-5]\d$/,
+                                                message: "Invalid time format",
+                                            },
+                                        })}
+                                    >
+                                        <SelectValue defaultValue={reservation.startTime.substring(0, reservation.startTime.length - 3)} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {Array.from({length: 31}, (_, i) => {
+                                            const hour = 6 + Math.floor(i / 2);
+                                            const minute = i % 2 === 0 ? "00" : "30";
+                                            const time = `${hour.toString().padStart(2, "0")}:${minute}`;
+                                            return (
+                                                <SelectItem key={time} value={time}>
+                                                    {time}
+                                                </SelectItem>
+                                            );
+                                        })}
+                                    </SelectContent>
+                                </Select>
+                                {errors.startTime && (
+                                    <span className="text-red-500 text-xs">
+                                        {errors.startTime.message}
+                                    </span>
+                                )}
                             </div>
-                            <div className="flex-1">
+                            {/* End Time Field */}
+                            <div>
                                 <Label>End Time</Label>
-                                <Input
-                                    type="time"
-                                    value={editData.endTime}
-                                    onChange={e => setEditData({...editData, endTime: e.target.value})}
-                                    required
-                                />
+                                <Select
+                                    onValueChange={(val) =>
+                                        setValue("endTime", val, {shouldValidate: true})
+                                    }
+                                    value={watch("endTime")}
+                                >
+                                    <SelectTrigger
+                                        {...register("endTime", {
+                                            required: "End time is required",
+                                            pattern: {
+                                                value: /^([01]\d|2[0-3]):[0-5]\d$/,
+                                                message: "Invalid time format",
+                                            },
+                                        })}
+                                    >
+                                        <SelectValue defaultValue={reservation.endTime.substring(0, reservation.endTime.length - 3)}/>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {Array.from({length: 31}, (_, i) => {
+                                            const hour = 6 + Math.floor(i / 2);
+                                            const minute = i % 2 === 0 ? "00" : "30";
+                                            const time = `${hour.toString().padStart(2, "0")}:${minute}`;
+                                            return (
+                                                <SelectItem key={time} value={time}>
+                                                    {time}
+                                                </SelectItem>
+                                            );
+                                        })}
+                                    </SelectContent>
+                                </Select>
+                                {errors.endTime && (
+                                    <span className="text-red-500 text-xs">
+                                        {errors.endTime.message}
+                                    </span>
+                                )}
                             </div>
                         </div>
+                        {/* Description Field */}
                         <div>
                             <Label>Description</Label>
                             <Textarea
-                                value={editData.description}
-                                onChange={e => setEditData({...editData, description: e.target.value})}
-                                maxLength={200}
-                                required
+                                {...register("description", {
+                                    required: "Description is required",
+                                    maxLength: {value: 200, message: "Max 200 characters"},
+                                })}
+                                placeholder="Enter a description for your reservation"
+                                className="resize-none"
                             />
+                            {errors.description && (
+                                <span className="text-red-500 text-xs">
+                                    {errors.description.message}
+                                </span>
+                            )}
+                            <p className="text-sm text-muted-foreground">
+                                Briefly describe the purpose of your reservation.
+                            </p>
                         </div>
+                        {/* Participants Field */}
                         <div>
                             <Label>Participants</Label>
                             <Input
-                                value={editData.participants}
-                                onChange={e => setEditData({...editData, participants: e.target.value})}
-                                maxLength={255}
-                                required
+                                placeholder="John, Jane, Alex"
+                                {...register("participants", {
+                                    required: "Participants are required",
+                                    maxLength: {value: 255, message: "Max 255 characters"},
+                                    pattern: {
+                                        value: /^[A-Za-zÄäÖöÜüßèéêç\s]+(,\s*[A-Za-zÄäÖöÜüßèéêç\s]+)*$/,
+                                        message: "Only letters, spaces, and commas allowed",
+                                    },
+                                })}
                             />
+                            {errors.participants && (
+                                <span className="text-red-500 text-xs">
+                                    {errors.participants.message}
+                                </span>
+                            )}
+                            <p className="text-sm text-muted-foreground">
+                                Enter participant names separated by commas (letters only).
+                            </p>
                         </div>
-                        {error && <div className="text-red-500 text-sm">{error}</div>}
                     </CardContent>
                     <CardFooter className="flex gap-2 mt-4">
                         <Button type="button" className={"w-1/2"} variant="secondary" onClick={() => setEditing(false)}>
@@ -319,7 +499,8 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
                         <div className="flex flex-col gap-1">
                             {reservation.privateKey && (
                                 <>
-                                    <Label htmlFor={"privatekey-input-current"} className={"cursor-pointer"}>Private Key</Label>
+                                    <Label htmlFor={"privatekey-input-current"} className={"cursor-pointer"}>Private
+                                                                                                             Key</Label>
                                     <Input
                                         id="privatekey-input-current"
                                         type="text"
@@ -335,7 +516,8 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
                             )}
                             {reservation.publicKey && (
                                 <>
-                                    <Label htmlFor={"publickey-input-current"} className={"cursor-pointer"}>Public Key</Label>
+                                    <Label htmlFor={"publickey-input-current"} className={"cursor-pointer"}>Public
+                                                                                                            Key</Label>
                                     <Input
                                         id="publickey-input-current"
                                         type="text"
@@ -355,16 +537,18 @@ export default function CurrentReservation({reservation}: { reservation?: Reserv
                 <CardFooter className="flex gap-2">
                     {isPrivate && (
                         <>
-                            <Button
-                                variant="secondary"
-                                onClick={() => setEditing(true)}
-                                title="Edit reservation"
-                                className={"w-1/2"}
-                            >
-                                <LucideEdit2 />
-                                Edit
-                            </Button>
-                            <DeleteSingleReservationDialog deleting={deleting} onDelete={handleDelete} />
+                            {new Date(reservation.date) >= new Date(new Date().setHours(0, 0, 0, 0)) && (
+                                <Button
+                                    variant="secondary"
+                                    onClick={() => setEditing(true)}
+                                    title="Edit reservation"
+                                    className={"w-1/2"}
+                                >
+                                    <LucideEdit2/>
+                                    Edit
+                                </Button>
+                            )}
+                            <DeleteSingleReservationDialog deleting={deleting} onDelete={handleDelete}/>
                         </>
                     )}
                 </CardFooter>
