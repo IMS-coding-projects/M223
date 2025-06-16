@@ -98,7 +98,7 @@ public class ReservationController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Reservation> updateReservation(@PathVariable UUID id, @RequestBody ReservationDTO reservationDTO, @RequestHeader UUID privateKey) {
+    public Object updateReservation(@PathVariable UUID id, @RequestBody ReservationDTO reservationDTO, @RequestHeader UUID privateKey) {
         try {
             Reservation reservation = reservationRepository.getFirstById(id);
             if (reservation == null) {
@@ -135,7 +135,7 @@ public class ReservationController {
                     })
                     .orElse(ResponseEntity.notFound().build());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
