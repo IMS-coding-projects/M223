@@ -82,7 +82,7 @@ public class Seeder implements CommandLineRunner {
                         LocalTime.of(10, 0),
                         room101,
                         "Team Meeting",
-                        "Chandra,Johnson",
+                        "Tom,Johnson",
                         UUID.randomUUID(),
                         UUID.randomUUID()
                 ));
@@ -93,7 +93,7 @@ public class Seeder implements CommandLineRunner {
                         LocalTime.of(12, 0),
                         room102,
                         "Project Discussion",
-                        "Natalia,Fluury",
+                        "Mac,Fluury",
                         UUID.randomUUID(),
                         UUID.randomUUID()
                 ));
@@ -104,7 +104,7 @@ public class Seeder implements CommandLineRunner {
                         LocalTime.of(12, 0),
                         room102,
                         "Project Feedback",
-                        "Pluh,Dario",
+                        "Pluh,Tompson",
                         UUID.randomUUID(),
                         UUID.randomUUID()
                 ));
