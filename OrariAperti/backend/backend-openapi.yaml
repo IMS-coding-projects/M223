@@ -11,7 +11,7 @@ paths:
     get:
       summary: "Get reservation by key"
       operationId: "getReservationByKey"
-      parameters:
+      parameters: 
         - name: "publicKey"
           in: "header"
           required: false

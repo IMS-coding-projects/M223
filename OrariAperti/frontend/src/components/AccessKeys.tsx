@@ -12,6 +12,8 @@ import {Button} from "@/components/ui/button.tsx";
 import { useEffect, useState } from "react";
 import type { Reservation } from "@/types/types";
 import { toast } from "sonner";
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx";
+import {Globe, LucideLink, LucideTriangleAlert, Shield} from "lucide-react";
 
 export default function AccessKeys({
     privateKey: initialPrivateKey,
@@ -72,7 +74,7 @@ export default function AccessKeys({
                     <CardContent className="flex-grow">
                         <div className="grid gap-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="privateKey">Private Key</Label>
+                                <Label htmlFor="privateKey"><Shield size={16}/> Private Key</Label>
                                 <Input
                                     type="text"
                                     id="privateKey"
@@ -81,9 +83,18 @@ export default function AccessKeys({
                                     value={privateKey}
                                     onChange={e => setPrivateKey(e.target.value)}
                                 />
+                                <Alert variant={"destructive"} >
+                                    <LucideTriangleAlert/>
+                                    <AlertTitle className={"text-xs"}>
+                                        Never share your private key with anyone.
+                                    </AlertTitle>
+                                    <AlertDescription className={"text-xs"}>
+                                        It is used to securely access and manage your reservations.
+                                    </AlertDescription>
+                                </Alert>
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="publicKey">Public Key</Label>
+                                <Label htmlFor="publicKey"><Globe size={16}/> Public Key</Label>
                                 <Input
                                     type="text"
                                     id="publicKey"
@@ -92,6 +103,15 @@ export default function AccessKeys({
                                     value={publicKey}
                                     onChange={e => setPublicKey(e.target.value)}
                                 />
+                            <Alert>
+                                <LucideLink/>
+                                <AlertTitle className={"text-xs"}>
+                                    Share your public key
+                                </AlertTitle>
+                                <AlertDescription className={"text-xs"}>
+                                    Share your public key with others to allow them to view your reservations without giving them access to manage them.
+                                </AlertDescription>
+                            </Alert>
                             </div>
                         </div>
                     </CardContent>
