@@ -1,0 +1,220 @@
+openapi: "3.1.0"
+info:
+  title: "OrariAperti Backend API"
+  description: "Backend API Description of the OrariAperti application."
+  version: "1.0.0"
+servers:
+  - url: "http://localhost:8080"
+    description: "Local server"
+paths:
+  /api/reservation:
+    get:
+      summary: "Get reservation by key"
+      operationId: "getReservationByKey"
+      parameters: 
+        - name: "publicKey"
+          in: "header"
+          required: false
+          schema:
+            type: "string"
+            format: "uuid"
+        - name: "privateKey"
+          in: "header"
+          required: false
+          schema:
+            type: "string"
+            format: "uuid"
+      responses:
+        "200":
+          description: "Reservation found"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reservationDetails:
+                    $ref: "#/components/schemas/Reservation"
+                  privateKey:
+                    type: string
+                    format: uuid
+                  publicKey:
+                    type: string
+                    format: uuid
+        "400":
+          description: "Bad request"
+        "404":
+          description: "Not found"
+    post:
+      summary: "Create a new reservation"
+      operationId: "createReservation"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReservationDTO"
+      responses:
+        "200":
+          description: "Reservation created"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reservation:
+                    $ref: "#/components/schemas/Reservation"
+                  privateKey:
+                    type: string
+                    format: uuid
+                  publicKey:
+                    type: string
+                    format: uuid
+        "400":
+          description: "Bad request"
+  /api/reservation/{id}:
+    put:
+      summary: "Update a reservation"
+      operationId: "updateReservation"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+        - name: "privateKey"
+          in: "header"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReservationDTO"
+      responses:
+        "200":
+          description: "Reservation updated"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reservation"
+        "400":
+          description: "Bad request"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not found"
+    delete:
+      summary: "Delete a reservation"
+      operationId: "deleteReservation"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+        - name: "privateKey"
+          in: "header"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      responses:
+        "200":
+          description: "Reservation deleted"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not found"
+  /api/room:
+    get:
+      summary: "Get all rooms"
+      operationId: "getRooms"
+      responses:
+        "200":
+          description: "List of rooms"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Room"
+        "404":
+          description: "No rooms found"
+components:
+  schemas:
+    Room:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        roomNumber:
+          type: string
+        roomFeatures:
+          type: array
+          items:
+            $ref: "#/components/schemas/RoomFeatures"
+    RoomFeatures:
+      type: string
+      enum:
+        - "Beamer"
+        - "Water Tap"
+        - "Whiteboard"
+        - "Air Conditioning"
+        - "Projector Screen"
+        - "Speaker System"
+        - "Video Conferencing"
+        - "WiFi"
+        - "Power Outlets"
+        - "Natural Light"
+        - "Soundproofing"
+        - "Smart Board"
+        - "Telephone"
+        - "Coffee Machine"
+        - "Printer"
+        - "Lockers"
+    Reservation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        date:
+          type: string
+          format: date
+        startTime:
+          type: string
+          format: partial-time
+        endTime:
+          type: string
+          format: partial-time
+        room:
+          $ref: "#/components/schemas/Room"
+        description:
+          type: string
+        participants:
+          type: string
+    ReservationDTO:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        startTime:
+          type: string
+          format: partial-time
+        endTime:
+          type: string
+          format: partial-time
+        roomId:
+          type: string
+          format: uuid
+        description:
+          type: string
+        participants:
+          type: string

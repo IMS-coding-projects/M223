@@ -15,14 +15,19 @@ OrariAperti is a room reservation system built with Spring Boot and React.
 
 ### Backend Development
 
-To run the backend only:
+To run the backend:
 
+1. **Copy and Modify the [application.properties](./src/main/resources/application.properties.example)**
+```bash
+mv ./src/main/resources/application.properties.example ./src/main/resources/application.properties
+```
+
+3. **Build the Application**
 ```bash
 mvn spring-boot:run
 ```
 
-and then:
-
+3. **Run the Application**
 ```bash
 java -jar target/OrariAperti-0.0.1-SNAPSHOT.jar
 ```
