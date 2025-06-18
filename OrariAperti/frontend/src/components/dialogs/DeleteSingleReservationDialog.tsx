@@ -28,7 +28,7 @@ export default function DeleteSingleReservationDialog({ onDelete, deleting }: { 
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction asChild>
-            <Button variant="destructive" onClick={onDelete} disabled={deleting}>
+            <Button variant={"destructive"} className={"bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 "} onClick={onDelete} disabled={deleting}>
               {deleting ? "Deleting..." : <><Trash2/>Delete</> }
             </Button>
           </AlertDialogAction>
