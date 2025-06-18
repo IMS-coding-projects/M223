@@ -1,7 +1,8 @@
-import {ThemeProvider} from "@/components/theme-provider.tsx";
+import {ThemeProvider} from "@/components/ui/theme-provider.tsx";
 import Header from "@/components/Header.tsx";
 import Main from "@/components/Main.tsx";
 import Footer from "@/components/Footer.tsx";
+import {Toaster} from "@/components/ui/sonner.tsx";
 
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
             <Header/>
             <Main/>
             <Footer/>
+            <Toaster/>
         </ThemeProvider>
     </>
   )
