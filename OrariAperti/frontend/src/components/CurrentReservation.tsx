@@ -14,7 +14,7 @@ import {useState, useEffect} from "react";
 import type {Reservation, Room, ReservationDTO} from "@/types/types";
 import NewReservationDialog from "@/components/dialogs/NewReservationDialog";
 import {toast} from "sonner";
-import {CalendarIcon, CircleX, Globe, LucideEdit2, LucideLink, Save, Shield, LucideTriangleAlert} from "lucide-react";
+import {CalendarIcon, CircleX, LucideEdit2, LucideLink, Save, LucideTriangleAlert} from "lucide-react";
 import {FeatureBadge} from "@/components/FeatureBadge";
 import {format} from "date-fns";
 import DeleteSingleReservationDialog from "@/components/dialogs/DeleteSingleReservationDialog.tsx";
